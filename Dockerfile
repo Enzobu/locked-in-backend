@@ -45,6 +45,8 @@ ADD docker/apache/entrypoint.sh /entrypoint.sh
 RUN chmod a+x /entrypoint.sh && \
     a2enmod rewrite remoteip ssl
 
+RUN echo "alias sc='symfony console'" >> ~/.bashrc
+
 CMD ["/entrypoint.sh"]
 
 EXPOSE 80
