@@ -39,14 +39,23 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            form_login:
+                login_path: app_admin_login
+                check_path: app_admin_login
+                default_target_path: app_admin_dashboard
+                enable_csrf: true
+            logout:
+                path: app_admin_logout
+                target: app_admin_login
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        - { path: ^/admin/login$, roles: PUBLIC_ACCESS }
         - { path: ^/api/login$, roles: PUBLIC_ACCESS }
         - { path: ^/api($|/docs|/docs\.jsonopenapi), roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: ROLE_CUSTOMER }
-        # - { path: ^/admin, roles: ROLE_USER }
+        - { path: ^/admin, roles: ROLE_USER }
 
 when@test:
     security:

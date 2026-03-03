@@ -56,12 +56,12 @@ class AppFixtures extends Fixture
         $manager->persist($company);
 
         $superAdmin = (new User())
-            ->setEmail('admin@openinnov.local')
+            ->setEmail('gmao@gmail.com')
             ->setFirstname('Alice')
             ->setLastname('Martin')
             ->setRoles(['ROLE_ADMIN', 'ROLE_OPERATOR'])
             ->setCompany($company);
-        $superAdmin->setPassword($this->passwordHasher->hashPassword($superAdmin, 'admin1234'));
+        $superAdmin->setPassword($this->passwordHasher->hashPassword($superAdmin, 'vR2gP5kykK'));
 
         $operator = (new User())
             ->setEmail('operator@openinnov.local')
