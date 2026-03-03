@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Backoffice{% endblock %}
+
+{% block body %}
+    <main style="max-width: 860px; margin: 3rem auto; font-family: sans-serif;">
+        <h1>Dashboard Backoffice</h1>
+        <p>Connecte en tant que {{ app.user.userIdentifier }}.</p>
+
+        <p>
+            <a href="{{ path('app_admin_logout') }}">Se deconnecter</a>
+        </p>
+    </main>
+{% endblock %}
