@@ -2,12 +2,17 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\SpecificationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SpecificationRepository::class)]
+#[ApiResource]
+#[ORM\Table(uniqueConstraints: [
+    new ORM\UniqueConstraint(name: 'uniq_specification_name', columns: ['name']),
+])]
 class Specification
 {
     #[ORM\Id]

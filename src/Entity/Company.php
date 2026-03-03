@@ -2,12 +2,19 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CompanyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
+#[ApiResource]
+#[ORM\Table(uniqueConstraints: [
+    new ORM\UniqueConstraint(name: 'uniq_company_siret', columns: ['siret']),
+    new ORM\UniqueConstraint(name: 'uniq_company_siren', columns: ['siren']),
+])]
+#[ORM\HasLifecycleCallbacks]
 class Company
 {
     #[ORM\Id]
@@ -27,7 +34,7 @@ class Company
     #[ORM\Column(length: 255)]
     private ?string $ape = null;
 
-    #[ORM\OneToOne(inversedBy: 'company', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'companies')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Address $address = null;
 
@@ -36,6 +43,12 @@ class Company
 
     #[ORM\Column(length: 50)]
     private ?string $phone = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     /**
      * @var Collection<int, User>
@@ -53,6 +66,8 @@ class Company
     {
         $this->users = new ArrayCollection();
         $this->lockerBays = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -113,7 +128,7 @@ class Company
         return $this->address;
     }
 
-    public function setAddress(Address $address): static
+    public function setAddress(?Address $address): static
     {
         $this->address = $address;
 
@@ -164,12 +179,7 @@ class Company
 
     public function removeUser(User $user): static
     {
-        if ($this->users->removeElement($user)) {
-            // set the owning side to null (unless already changed)
-            if ($user->getCompany() === $this) {
-                $user->setCompany(null);
-            }
-        }
+        $this->users->removeElement($user);
 
         return $this;
     }
@@ -194,13 +204,32 @@ class Company
 
     public function removeLockerBay(LockerBay $lockerBay): static
     {
-        if ($this->lockerBays->removeElement($lockerBay)) {
-            // set the owning side to null (unless already changed)
-            if ($lockerBay->getCompany() === $this) {
-                $lockerBay->setCompany(null);
-            }
-        }
+        $this->lockerBays->removeElement($lockerBay);
 
         return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        $now = new \DateTimeImmutable();
+        $this->createdAt ??= $now;
+        $this->updatedAt = $now;
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 }

@@ -2,12 +2,18 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\LockerBayRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: LockerBayRepository::class)]
+#[ApiResource]
+#[ORM\Table(uniqueConstraints: [
+    new ORM\UniqueConstraint(name: 'uniq_company_locker_bay_name', columns: ['company_id', 'name']),
+])]
+#[ORM\HasLifecycleCallbacks]
 class LockerBay
 {
     #[ORM\Id]
@@ -18,10 +24,10 @@ class LockerBay
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 7)]
     private ?string $latitude = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 7)]
     private ?string $longitude = null;
 
     #[ORM\ManyToOne(inversedBy: 'lockerBays')]
@@ -40,9 +46,17 @@ class LockerBay
     #[ORM\Column(nullable: true)]
     private ?int $minDuration = null;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $updatedAt = null;
+
     public function __construct()
     {
         $this->lockers = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -150,5 +164,29 @@ class LockerBay
         $this->minDuration = $minDuration;
 
         return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        $now = new \DateTimeImmutable();
+        $this->createdAt ??= $now;
+        $this->updatedAt = $now;
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 }
