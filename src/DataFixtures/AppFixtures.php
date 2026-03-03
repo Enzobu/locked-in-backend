@@ -16,11 +16,25 @@ use App\Enum\LockerActionStatus;
 use App\Enum\LockerStatus;
 use App\Enum\ReservationStatus;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
+    private const CITIES = [
+        ['name' => 'Paris', 'lat' => 48.8566130, 'lng' => 2.3522220],
+        ['name' => 'Marseille', 'lat' => 43.2964820, 'lng' => 5.3697800],
+        ['name' => 'Lyon', 'lat' => 45.7640430, 'lng' => 4.8356590],
+        ['name' => 'Toulouse', 'lat' => 43.6046520, 'lng' => 1.4442090],
+        ['name' => 'Nice', 'lat' => 43.7101730, 'lng' => 7.2619530],
+        ['name' => 'Nantes', 'lat' => 47.2183710, 'lng' => -1.5536210],
+        ['name' => 'Montpellier', 'lat' => 43.6107690, 'lng' => 3.8767160],
+        ['name' => 'Strasbourg', 'lat' => 48.5734050, 'lng' => 7.7521110],
+        ['name' => 'Bordeaux', 'lat' => 44.8377890, 'lng' => -0.5791800],
+        ['name' => 'Lille', 'lat' => 50.6292500, 'lng' => 3.0572560],
+    ];
+
     public function __construct(
         private readonly UserPasswordHasherInterface $passwordHasher,
     ) {
@@ -28,239 +42,303 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $hqAddress = (new Address())
-            ->setNumber('12')
-            ->setStreet('Rue de la Republique')
-            ->setCity('Lyon')
-            ->setCountry('France')
-            ->setComplement('Batiment A');
+        $fakerFactoryClass = 'Faker\\Factory';
+        if (!class_exists($fakerFactoryClass)) {
+            throw new \RuntimeException('fakerphp/faker is required. Run: composer require --dev fakerphp/faker');
+        }
 
-        $secondaryAddress = (new Address())
-            ->setNumber('5B')
-            ->setStreet('Avenue des Alpes')
-            ->setCity('Grenoble')
-            ->setCountry('France');
+        $faker = $fakerFactoryClass::create('fr_FR');
+        $faker->seed(20260303);
 
-        $manager->persist($hqAddress);
-        $manager->persist($secondaryAddress);
+        $specificationIds = $this->createSpecifications($manager);
+        [$companyIds, $customerIds] = $this->createCompaniesUsersCustomers($manager, $faker);
 
-        $company = (new Company())
-            ->setName('Open Innov')
-            ->setSiret('12345678901234')
-            ->setSiren('123456789')
-            ->setApe('6201Z')
-            ->setJuridicForm('SAS')
-            ->setPhone('+33472000000')
-            ->setAddress($hqAddress);
+        $this->createParksAndReservations($manager, $faker, $companyIds, $customerIds, $specificationIds);
+    }
 
-        $manager->persist($company);
+    /**
+     * @return int[]
+     */
+    private function createSpecifications(ObjectManager $manager): array
+    {
+        $specs = [
+            ['name' => 'S - Compact', 'w' => 25, 'h' => 20, 'd' => 35, 'material' => 'Steel', 'rechargeable' => false],
+            ['name' => 'M - Standard', 'w' => 35, 'h' => 30, 'd' => 45, 'material' => 'Steel', 'rechargeable' => false],
+            ['name' => 'M+ - Recharge', 'w' => 40, 'h' => 35, 'd' => 50, 'material' => 'Steel', 'rechargeable' => true],
+            ['name' => 'L - Cargo', 'w' => 50, 'h' => 45, 'd' => 60, 'material' => 'Aluminum', 'rechargeable' => true],
+            ['name' => 'XL - Premium', 'w' => 60, 'h' => 60, 'd' => 70, 'material' => 'Composite', 'rechargeable' => true],
+        ];
 
-        $superAdmin = (new User())
-            ->setEmail('gmao@gmail.com')
-            ->setFirstname('Alice')
-            ->setLastname('Martin')
-            ->setRoles(['ROLE_ADMIN', 'ROLE_OPERATOR'])
-            ->setCompany($company);
-        $superAdmin->setPassword($this->passwordHasher->hashPassword($superAdmin, 'vR2gP5kykK'));
+        $ids = [];
+        foreach ($specs as $spec) {
+            $entity = (new Specification())
+                ->setName($spec['name'])
+                ->setWidth($spec['w'])
+                ->setHeight($spec['h'])
+                ->setDepth($spec['d'])
+                ->setMaterial($spec['material'])
+                ->setIsRechargeable($spec['rechargeable']);
 
-        $operator = (new User())
-            ->setEmail('operator@openinnov.local')
-            ->setFirstname('Nicolas')
-            ->setLastname('Durand')
-            ->setRoles(['ROLE_OPERATOR'])
-            ->setCompany($company);
-        $operator->setPassword($this->passwordHasher->hashPassword($operator, 'operator1234'));
-
-        $manager->persist($superAdmin);
-        $manager->persist($operator);
-
-        $smallSpec = (new Specification())
-            ->setName('S - Standard')
-            ->setWidth(30)
-            ->setHeight(20)
-            ->setDepth(40)
-            ->setMaterial('Steel')
-            ->setIsRechargeable(false);
-
-        $mediumSpec = (new Specification())
-            ->setName('M - Charge')
-            ->setWidth(40)
-            ->setHeight(30)
-            ->setDepth(50)
-            ->setMaterial('Steel')
-            ->setIsRechargeable(true);
-
-        $largeSpec = (new Specification())
-            ->setName('L - XL')
-            ->setWidth(50)
-            ->setHeight(45)
-            ->setDepth(60)
-            ->setMaterial('Aluminum')
-            ->setIsRechargeable(true);
-
-        $manager->persist($smallSpec);
-        $manager->persist($mediumSpec);
-        $manager->persist($largeSpec);
-
-        $lockerBayCenter = (new LockerBay())
-            ->setName('Lyon Centre')
-            ->setCompany($company)
-            ->setLatitude('45.7640430')
-            ->setLongitude('4.8356590')
-            ->setMinDuration(30)
-            ->setMaxDuration(24 * 60);
-
-        $lockerBayStation = (new LockerBay())
-            ->setName('Lyon Part-Dieu')
-            ->setCompany($company)
-            ->setLatitude('45.7600000')
-            ->setLongitude('4.8600000')
-            ->setMinDuration(30)
-            ->setMaxDuration(12 * 60);
-
-        $manager->persist($lockerBayCenter);
-        $manager->persist($lockerBayStation);
-
-        $locker1 = (new Locker())
-            ->setNumber(1)
-            ->setSpecification($smallSpec)
-            ->setLockerBay($lockerBayCenter)
-            ->setPriceCents(300)
-            ->setHardwareId('LOCK-LYON-C-001')
-            ->setStatus(LockerStatus::AVAILABLE)
-            ->setLastSeenAt(new \DateTimeImmutable('-2 minutes'));
-
-        $locker2 = (new Locker())
-            ->setNumber(2)
-            ->setSpecification($mediumSpec)
-            ->setLockerBay($lockerBayCenter)
-            ->setPriceCents(450)
-            ->setHardwareId('LOCK-LYON-C-002')
-            ->setStatus(LockerStatus::RESERVED)
-            ->setLastSeenAt(new \DateTimeImmutable('-1 minutes'));
-
-        $locker3 = (new Locker())
-            ->setNumber(1)
-            ->setSpecification($largeSpec)
-            ->setLockerBay($lockerBayStation)
-            ->setPriceCents(650)
-            ->setHardwareId('LOCK-LYON-PD-001')
-            ->setStatus(LockerStatus::OCCUPIED)
-            ->setLastSeenAt(new \DateTimeImmutable('-5 minutes'));
-
-        $locker4 = (new Locker())
-            ->setNumber(2)
-            ->setSpecification($smallSpec)
-            ->setLockerBay($lockerBayStation)
-            ->setPriceCents(250)
-            ->setHardwareId('LOCK-LYON-PD-002')
-            ->setStatus(LockerStatus::OFFLINE)
-            ->setLastSeenAt(new \DateTimeImmutable('-3 hours'));
-
-        $manager->persist($locker1);
-        $manager->persist($locker2);
-        $manager->persist($locker3);
-        $manager->persist($locker4);
-
-        $customerA = (new Customer())
-            ->setEmail('lea.dupont@example.com')
-            ->setFirstname('Lea')
-            ->setLastname('Dupont')
-            ->setBirthDate(new \DateTimeImmutable('1995-03-14'))
-            ->setRoles(['ROLE_CUSTOMER']);
-        $customerA->addAddress($secondaryAddress);
-        $customerA->setPassword($this->passwordHasher->hashPassword($customerA, 'customer1234'));
-
-        $customerB = (new Customer())
-            ->setEmail('yanis.bernard@example.com')
-            ->setFirstname('Yanis')
-            ->setLastname('Bernard')
-            ->setBirthDate(new \DateTimeImmutable('1991-08-28'))
-            ->setRoles(['ROLE_CUSTOMER']);
-        $customerB->addAddress($hqAddress);
-        $customerB->setPassword($this->passwordHasher->hashPassword($customerB, 'customer1234'));
-
-        $manager->persist($customerA);
-        $manager->persist($customerB);
-
-        $activeReservation = (new Reservation())
-            ->setCustomer($customerA)
-            ->setLocker($locker3)
-            ->setStartsAt(new \DateTimeImmutable('-30 minutes'))
-            ->setEndsAt(new \DateTimeImmutable('+30 minutes'))
-            ->setStatus(ReservationStatus::ACTIVE);
-
-        $upcomingReservation = (new Reservation())
-            ->setCustomer($customerB)
-            ->setLocker($locker2)
-            ->setStartsAt(new \DateTimeImmutable('+45 minutes'))
-            ->setEndsAt(new \DateTimeImmutable('+2 hours'))
-            ->setStatus(ReservationStatus::CONFIRMED);
-
-        $completedReservation = (new Reservation())
-            ->setCustomer($customerA)
-            ->setLocker($locker1)
-            ->setStartsAt(new \DateTimeImmutable('-2 days'))
-            ->setEndsAt(new \DateTimeImmutable('-2 days +2 hours'))
-            ->setStatus(ReservationStatus::COMPLETED);
-
-        $manager->persist($activeReservation);
-        $manager->persist($upcomingReservation);
-        $manager->persist($completedReservation);
-
-        $openAction = (new LockerAction())
-            ->setLocker($locker3)
-            ->setReservation($activeReservation)
-            ->setType('open')
-            ->setStatus(LockerActionStatus::SUCCESS)
-            ->setRequestedByCustomer($customerA)
-            ->setProcessedAt(new \DateTimeImmutable('-25 minutes'));
-
-        $adminAction = (new LockerAction())
-            ->setLocker($locker2)
-            ->setReservation($upcomingReservation)
-            ->setType('unlock_override')
-            ->setStatus(LockerActionStatus::SENT)
-            ->setRequestedByUser($operator);
-
-        $failedAction = (new LockerAction())
-            ->setLocker($locker4)
-            ->setType('ping')
-            ->setStatus(LockerActionStatus::FAILED)
-            ->setRequestedByUser($superAdmin)
-            ->setProcessedAt(new \DateTimeImmutable('-2 hours'))
-            ->setErrorMessage('No response from locker controller.');
-
-        $manager->persist($openAction);
-        $manager->persist($adminAction);
-        $manager->persist($failedAction);
-
-        $manager->persist(
-            (new LockerEvent())
-                ->setLocker($locker3)
-                ->setReservation($activeReservation)
-                ->setType('door_opened')
-                ->setOccurredAt(new \DateTimeImmutable('-25 minutes'))
-                ->setPayload(['source' => 'mobile_app'])
-        );
-
-        $manager->persist(
-            (new LockerEvent())
-                ->setLocker($locker3)
-                ->setReservation($activeReservation)
-                ->setType('door_closed')
-                ->setOccurredAt(new \DateTimeImmutable('-24 minutes'))
-                ->setPayload(['source' => 'sensor'])
-        );
-
-        $manager->persist(
-            (new LockerEvent())
-                ->setLocker($locker4)
-                ->setType('heartbeat_timeout')
-                ->setOccurredAt(new \DateTimeImmutable('-2 hours'))
-                ->setPayload(['last_seen_minutes_ago' => 180])
-        );
+            $manager->persist($entity);
+            $ids[] = $entity;
+        }
 
         $manager->flush();
+
+        return array_map(static fn (Specification $s): int => (int) $s->getId(), $ids);
+    }
+
+    /**
+     * @return array{0: int[], 1: int[]}
+     */
+    private function createCompaniesUsersCustomers(ObjectManager $manager, object $faker): array
+    {
+        $companies = [];
+        $customers = [];
+
+        for ($i = 1; $i <= 20; ++$i) {
+            $city = self::CITIES[($i - 1) % count(self::CITIES)]['name'];
+
+            $address = (new Address())
+                ->setNumber((string) $faker->numberBetween(1, 220))
+                ->setStreet($faker->streetName())
+                ->setCity($city)
+                ->setCountry('France')
+                ->setComplement($faker->boolean(30) ? ('Batiment '.$faker->randomLetter().$faker->numberBetween(1, 9)) : null);
+
+            $company = (new Company())
+                ->setName(sprintf('Societe%02d', $i))
+                ->setSiret(sprintf('%014d', 10000000000000 + $i))
+                ->setSiren(sprintf('%09d', 100000000 + $i))
+                ->setApe('6201Z')
+                ->setJuridicForm($faker->randomElement(['SAS', 'SARL']))
+                ->setPhone('+33'.sprintf('%09d', $faker->numberBetween(100000000, 999999999)))
+                ->setAddress($address);
+
+            $user = (new User())
+                ->setEmail(sprintf('admin@societe%02d.com', $i))
+                ->setFirstname('Admin')
+                ->setLastname(sprintf('Societe%02d', $i))
+                ->setRoles(['ROLE_USER'])
+                ->setCompany($company);
+            $user->setPassword($this->passwordHasher->hashPassword($user, 'admin1234'));
+
+            $manager->persist($address);
+            $manager->persist($company);
+            $manager->persist($user);
+
+            $companies[] = $company;
+        }
+
+        $superAdmin = (new User())
+            ->setEmail('superadmin@openinnov.com')
+            ->setFirstname('Super')
+            ->setLastname('Admin')
+            ->setRoles(['ROLE_ADMIN', 'ROLE_USER'])
+            ->setCompany($companies[0]);
+        $superAdmin->setPassword($this->passwordHasher->hashPassword($superAdmin, 'superadmin1234'));
+        $manager->persist($superAdmin);
+
+        for ($i = 1; $i <= 10; ++$i) {
+            $city = self::CITIES[array_rand(self::CITIES)]['name'];
+
+            $customerAddress = (new Address())
+                ->setNumber((string) $faker->numberBetween(1, 220))
+                ->setStreet($faker->streetName())
+                ->setCity($city)
+                ->setCountry('France');
+
+            $customer = (new Customer())
+                ->setEmail(sprintf('customer%d@openinnov.com', $i))
+                ->setFirstname($faker->firstName())
+                ->setLastname($faker->lastName())
+                ->setBirthDate(\DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-55 years', '-20 years')))
+                ->setRoles(['ROLE_CUSTOMER']);
+
+            $customer->addAddress($customerAddress);
+            $customer->setPassword($this->passwordHasher->hashPassword($customer, 'customer1234'));
+
+            $manager->persist($customerAddress);
+            $manager->persist($customer);
+
+            $customers[] = $customer;
+        }
+
+        $manager->flush();
+
+        return [
+            array_map(static fn (Company $company): int => (int) $company->getId(), $companies),
+            array_map(static fn (Customer $customer): int => (int) $customer->getId(), $customers),
+        ];
+    }
+
+    /**
+     * @param int[] $companyIds
+     * @param int[] $customerIds
+     * @param int[] $specificationIds
+     */
+    private function createParksAndReservations(ObjectManager $manager, object $faker, array $companyIds, array $customerIds, array $specificationIds): void
+    {
+        if (!$manager instanceof EntityManagerInterface) {
+            throw new \RuntimeException('EntityManagerInterface is required to load fixtures.');
+        }
+
+        $entityManager = $manager;
+        $now = new \DateTimeImmutable();
+
+        foreach ($companyIds as $index => $companyId) {
+            $city = self::CITIES[$index % count(self::CITIES)];
+
+            $bayCount = $faker->numberBetween(3, 6);
+            for ($bayIndex = 1; $bayIndex <= $bayCount; ++$bayIndex) {
+                /** @var Company $company */
+                $company = $entityManager->getReference(Company::class, $companyId);
+
+                $lockerBay = (new LockerBay())
+                    ->setName(sprintf('%s Hub %d', $city['name'], $bayIndex))
+                    ->setCompany($company)
+                    ->setLatitude(number_format($city['lat'] + ($faker->numberBetween(-800, 800) / 100000), 7, '.', ''))
+                    ->setLongitude(number_format($city['lng'] + ($faker->numberBetween(-800, 800) / 100000), 7, '.', ''))
+                    ->setMinDuration($faker->randomElement([15, 30, 60]))
+                    ->setMaxDuration($faker->randomElement([720, 1440, 2880]));
+
+                $entityManager->persist($lockerBay);
+                $entityManager->flush();
+
+                $lockerBayId = (int) $lockerBay->getId();
+
+                $lockerCount = $faker->numberBetween(10, 30);
+                for ($lockerNumber = 1; $lockerNumber <= $lockerCount; ++$lockerNumber) {
+                    $status = $this->randomLockerStatus($faker);
+                    $specificationId = $specificationIds[array_rand($specificationIds)];
+                    /** @var LockerBay $lockerBayRef */
+                    $lockerBayRef = $entityManager->getReference(LockerBay::class, $lockerBayId);
+                    /** @var Specification $specification */
+                    $specification = $entityManager->getReference(Specification::class, $specificationId);
+
+                    $locker = (new Locker())
+                        ->setNumber($lockerNumber)
+                        ->setHardwareId(sprintf('LOCK-C%02d-B%02d-L%03d', $index + 1, $bayIndex, $lockerNumber))
+                        ->setSpecification($specification)
+                        ->setPriceCents($faker->numberBetween(250, 2000))
+                        ->setLockerBay($lockerBayRef)
+                        ->setStatus($status)
+                        ->setLastSeenAt($this->lastSeenForStatus($status, $now, $faker));
+
+                    $entityManager->persist($locker);
+
+                    $reservationCount = $faker->numberBetween(1, 20);
+                    for ($r = 0; $r < $reservationCount; ++$r) {
+                        $customerId = $customerIds[array_rand($customerIds)];
+                        /** @var Customer $customer */
+                        $customer = $entityManager->getReference(Customer::class, $customerId);
+
+                        [$startsAt, $endsAt, $reservationStatus] = $this->randomReservationWindow($now, $faker);
+
+                        $reservation = (new Reservation())
+                            ->setCustomer($customer)
+                            ->setLocker($locker)
+                            ->setStartsAt($startsAt)
+                            ->setEndsAt($endsAt)
+                            ->setStatus($reservationStatus);
+
+                        $entityManager->persist($reservation);
+
+                        if ($faker->boolean(18)) {
+                            $event = (new LockerEvent())
+                                ->setLocker($locker)
+                                ->setReservation($reservation)
+                                ->setType($reservationStatus === ReservationStatus::ACTIVE ? 'door_opened' : 'reservation_synced')
+                                ->setOccurredAt($startsAt)
+                                ->setPayload(['status' => $reservationStatus->value]);
+                            $entityManager->persist($event);
+                        }
+
+                        if ($faker->boolean(15)) {
+                            $actionStatus = $faker->randomElement([
+                                LockerActionStatus::SUCCESS,
+                                LockerActionStatus::SENT,
+                                LockerActionStatus::FAILED,
+                            ]);
+
+                            $action = (new LockerAction())
+                                ->setLocker($locker)
+                                ->setReservation($reservation)
+                                ->setType($faker->randomElement(['open', 'close', 'unlock_override']))
+                                ->setStatus($actionStatus)
+                                ->setRequestedByCustomer($customer)
+                                ->setProcessedAt($startsAt->modify('+1 minute'));
+
+                            if ($actionStatus === LockerActionStatus::FAILED) {
+                                $action->setErrorMessage('Temporary communication timeout.');
+                            }
+
+                            $entityManager->persist($action);
+                        }
+                    }
+                }
+
+                $entityManager->flush();
+                $entityManager->clear();
+            }
+        }
+
+        $entityManager->flush();
+    }
+
+    private function randomLockerStatus(object $faker): LockerStatus
+    {
+        $roll = $faker->numberBetween(1, 100);
+
+        return match (true) {
+            $roll <= 10 => LockerStatus::OFFLINE,
+            $roll <= 18 => LockerStatus::OUT_OF_ORDER,
+            $roll <= 45 => LockerStatus::OCCUPIED,
+            $roll <= 62 => LockerStatus::RESERVED,
+            default => LockerStatus::AVAILABLE,
+        };
+    }
+
+    private function lastSeenForStatus(LockerStatus $status, \DateTimeImmutable $now, object $faker): \DateTimeImmutable
+    {
+        return match ($status) {
+            LockerStatus::OFFLINE => $now->modify('-'.$faker->numberBetween(4, 48).' hours'),
+            LockerStatus::OUT_OF_ORDER => $now->modify('-'.$faker->numberBetween(2, 12).' hours'),
+            default => $now->modify('-'.$faker->numberBetween(1, 120).' minutes'),
+        };
+    }
+
+    /**
+     * @return array{0: \DateTimeImmutable, 1: \DateTimeImmutable, 2: ReservationStatus}
+     */
+    private function randomReservationWindow(\DateTimeImmutable $now, object $faker): array
+    {
+        $bucketRoll = $faker->numberBetween(1, 100);
+
+        if ($bucketRoll <= 60) {
+            $startsAt = $now->modify('-'.$faker->numberBetween(2, 180).' days -'.$faker->numberBetween(0, 20).' hours');
+            $endsAt = $startsAt->modify('+'.$faker->numberBetween(30, 360).' minutes');
+            $status = $faker->randomElement([
+                ReservationStatus::COMPLETED,
+                ReservationStatus::COMPLETED,
+                ReservationStatus::CANCELLED,
+                ReservationStatus::EXPIRED,
+            ]);
+
+            return [$startsAt, $endsAt, $status];
+        }
+
+        if ($bucketRoll <= 90) {
+            $startsAt = $now->modify('+'.$faker->numberBetween(1, 120).' days +'.$faker->numberBetween(0, 20).' hours');
+            $endsAt = $startsAt->modify('+'.$faker->numberBetween(30, 300).' minutes');
+            $status = $faker->boolean(75) ? ReservationStatus::CONFIRMED : ReservationStatus::PENDING;
+
+            return [$startsAt, $endsAt, $status];
+        }
+
+        $startsAt = $now->modify('-'.$faker->numberBetween(5, 180).' minutes');
+        $endsAt = $now->modify('+'.$faker->numberBetween(10, 240).' minutes');
+
+        return [$startsAt, $endsAt, ReservationStatus::ACTIVE];
     }
 }
