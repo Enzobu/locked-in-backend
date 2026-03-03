@@ -7,6 +7,7 @@ use App\Repository\SpecificationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SpecificationRepository::class)]
 #[ApiResource]
@@ -18,24 +19,31 @@ class Specification
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['locker:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['locker:read'])]
     private ?int $width = null;
 
     #[ORM\Column]
+    #[Groups(['locker:read'])]
     private ?int $height = null;
 
     #[ORM\Column]
+    #[Groups(['locker:read'])]
     private ?int $depth = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['locker:read'])]
     private ?string $material = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['locker:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    #[Groups(['locker:read'])]
     private bool $isRechargeable = false;
 
     /**

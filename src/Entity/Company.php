@@ -7,6 +7,7 @@ use App\Repository\CompanyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 #[ApiResource]
@@ -20,15 +21,18 @@ class Company
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['locker_bay:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['locker_bay:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
     private ?string $siret = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['locker_bay:read'])]
     private ?string $siren = null;
 
     #[ORM\Column(length: 255)]
@@ -36,6 +40,7 @@ class Company
 
     #[ORM\ManyToOne(inversedBy: 'companies')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['locker_bay:read'])]
     private ?Address $address = null;
 
     #[ORM\Column(length: 255)]
