@@ -45,7 +45,15 @@ ADD docker/apache/entrypoint.sh /entrypoint.sh
 RUN chmod a+x /entrypoint.sh && \
     a2enmod rewrite remoteip ssl
 
-RUN echo "alias sc='symfony console'" >> ~/.bashrc
+RUN echo 'alias ll="ls -al"' >> ~/.bashrc
+
+RUN echo 'alias dfl="symfony console doctrine:database:drop --force && symfony console doctrine:database:create && symfony console d:s:u --force -n && symfony console doctrine:fixtures:load -n"' >> ~/.bashrc
+RUN echo 'alias sc="symfony console"' >> ~/.bashrc
+RUN echo 'alias scme="symfony console make:entity"' >> ~/.bashrc
+RUN echo 'alias scmc="symfony console make:controller"' >> ~/.bashrc
+RUN echo 'alias scmcrud="symfony console make:crud"' >> ~/.bashrc
+RUN echo 'alias scmf="symfony console make:form"' >> ~/.bashrc
+RUN echo 'alias cc="symfony console cache:clear"' >> ~/.bashrc
 
 CMD ["/entrypoint.sh"]
 

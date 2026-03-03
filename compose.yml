@@ -3,7 +3,7 @@ name: locked-in
 services:
   ###> doctrine/doctrine-bundle ###
   database:
-    image: mariadb:12.0.2-ubi10
+    image: mariadb:11.8.5-ubi9
     container_name: locked-in-database
     environment:
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD:-root_password}
@@ -20,7 +20,7 @@ services:
   ###< doctrine/doctrine-bundle ###
 
   phpmyadmin:
-    image: phpmyadmin:5.2.1
+    image: phpmyadmin:5.2.3
     container_name: locked-in-phpmyadmin
     ports:
       - 8080:80
