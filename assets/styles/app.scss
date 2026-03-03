@@ -59,20 +59,6 @@ $enable-shadows: true;
   @media (prefers-color-scheme: dark) {
     background: rgba(150, 180, 245, 0.09);
   }
-}.sidebar-btn-active {
-  background: rgba(30, 79, 188, 0.045);
-
-  @media (prefers-color-scheme: dark) {
-    background: rgba(150, 180, 245, 0.045);
-  }
-}
-
-.sidebar-btn:hover {
-  background: rgba(30, 79, 188, 0.09);
-
-  @media (prefers-color-scheme: dark) {
-    background: rgba(150, 180, 245, 0.09);
-  }
 }
 
 .h-full {
@@ -135,10 +121,57 @@ label.required:after {
 @import "../../vendor/twbs/bootstrap/scss/list-group";
 @import "../../vendor/twbs/bootstrap/scss/close";
 @import "../../vendor/twbs/bootstrap/scss/modal";
+@import "../../vendor/twbs/bootstrap/scss/offcanvas";
 @import "../../vendor/twbs/bootstrap/scss/tooltip";
 @import "../../vendor/twbs/bootstrap/scss/popover";
 @import "../../vendor/twbs/bootstrap/scss/utilities/api";
 @import "../../vendor/twbs/bootstrap/scss/accordion";
+
+.admin-body {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.admin-shell {
+  height: 100vh;
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.04) 0%, rgba(37, 99, 235, 0) 30%);
+}
+
+.admin-sidebar {
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+}
+
+.admin-main-column {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.admin-content-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.dashboard-kpi {
+  border: 1px solid var(--bs-border-color);
+}
+
+.login-body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.1), transparent 45%),
+    radial-gradient(circle at 80% 90%, rgba(22, 163, 74, 0.08), transparent 50%);
+}
+
+.login-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
 
 // Variables pour le thème sombre dans media query (prefers-color-scheme: dark)
 @media (prefers-color-scheme: dark) {

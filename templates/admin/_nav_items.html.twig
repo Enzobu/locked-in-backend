@@ -1,0 +1,24 @@
+{% set currentRoute = app.request.attributes.get('_route') %}
+
+<a
+    href="{{ path('app_admin_dashboard') }}"
+    class="nav-link sidebar-btn d-flex align-items-center gap-2 rounded-3 px-3 py-2 {{ currentRoute starts with 'app_admin_dashboard' ? 'sidebar-btn-active fw-semibold text-primary-emphasis' : 'text-body' }}"
+>
+    <span>Tableau de bord</span>
+</a>
+
+<a
+    href="/api"
+    class="nav-link sidebar-btn d-flex align-items-center gap-2 rounded-3 px-3 py-2 text-body"
+    target="_blank"
+    rel="noreferrer"
+>
+    <span>API Docs</span>
+</a>
+
+<a
+    href="{{ path('app_admin_logout') }}"
+    class="nav-link sidebar-btn d-flex align-items-center gap-2 rounded-3 px-3 py-2 text-danger"
+>
+    <span>Deconnexion</span>
+</a>

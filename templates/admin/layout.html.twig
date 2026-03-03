@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block body_class %}admin-body{% endblock %}
+
+{% block body %}
+    <div class="container-fluid admin-shell px-0">
+        <div class="row g-0">
+            <aside class="col-xl-2 col-lg-3 d-none d-lg-block border-end bg-body-tertiary admin-sidebar">
+                <div class="p-3 border-bottom">
+                    <p class="text-uppercase text-body-secondary fw-semibold small mb-1">Open Innov</p>
+                    <h1 class="h5 mb-0">Backoffice</h1>
+                </div>
+
+                <nav class="p-3 d-grid gap-2">
+                    {% include 'admin/_nav_items.html.twig' %}
+                </nav>
+            </aside>
+
+            <div class="col-xl-10 col-lg-9 admin-main-column">
+                <header class="border-bottom bg-body z-2 flex-shrink-0">
+                    <div class="d-flex align-items-center justify-content-between px-3 py-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <button class="btn btn-outline-secondary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminSidebar" aria-controls="adminSidebar">
+                                Menu
+                            </button>
+                            <div>
+                                <p class="text-uppercase text-body-secondary fw-semibold small mb-1">Administration</p>
+                                <p class="mb-0 fw-semibold">{{ app.user ? app.user.userIdentifier : 'Utilisateur' }}</p>
+                            </div>
+                        </div>
+
+                        <a href="{{ path('app_admin_logout') }}" class="btn btn-outline-danger btn-sm">Se deconnecter</a>
+                    </div>
+                </header>
+
+                <main class="p-3 p-lg-4 admin-content-scroll mb-2">
+                    {% block admin_content %}{% endblock %}
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="adminSidebar" aria-labelledby="adminSidebarLabel">
+        <div class="offcanvas-header border-bottom">
+            <div>
+                <p class="text-uppercase text-body-secondary fw-semibold small mb-1">Open Innov</p>
+                <h2 class="h5 mb-0" id="adminSidebarLabel">Backoffice</h2>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body d-grid gap-2">
+            {% include 'admin/_nav_items.html.twig' %}
+        </div>
+    </div>
+{% endblock %}
