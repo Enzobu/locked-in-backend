@@ -176,6 +176,14 @@
           }
         },
         {
+          "name": "Get my customer profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{apiPrefix}}/customers/me"
+          }
+        },
+        {
           "name": "Get reservations",
           "request": {
             "method": "GET",
