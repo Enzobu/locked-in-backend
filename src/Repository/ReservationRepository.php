@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Locker;
 use App\Entity\Reservation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,28 +17,54 @@ class ReservationRepository extends ServiceEntityRepository
         parent::__construct($registry, Reservation::class);
     }
 
-    //    /**
-    //     * @return Reservation[] Returns an array of Reservation objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('r.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return Reservation[]
+     */
+    public function findUpcomingForLocker(Locker $locker, \DateTimeImmutable $now, int $limit = 10): array
+    {
+        return $this->createQueryBuilder('r')
+            ->leftJoin('r.customer', 'c')->addSelect('c')
+            ->andWhere('r.locker = :locker')
+            ->andWhere('r.startsAt > :now')
+            ->setParameter('locker', $locker)
+            ->setParameter('now', $now)
+            ->orderBy('r.startsAt', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Reservation
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * @return Reservation[]
+     */
+    public function findCurrentForLocker(Locker $locker, \DateTimeImmutable $now): array
+    {
+        return $this->createQueryBuilder('r')
+            ->leftJoin('r.customer', 'c')->addSelect('c')
+            ->andWhere('r.locker = :locker')
+            ->andWhere('r.startsAt <= :now')
+            ->andWhere('r.endsAt >= :now')
+            ->setParameter('locker', $locker)
+            ->setParameter('now', $now)
+            ->orderBy('r.startsAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Reservation[]
+     */
+    public function findHistoryForLocker(Locker $locker, \DateTimeImmutable $now, int $limit = 20): array
+    {
+        return $this->createQueryBuilder('r')
+            ->leftJoin('r.customer', 'c')->addSelect('c')
+            ->andWhere('r.locker = :locker')
+            ->andWhere('r.endsAt < :now')
+            ->setParameter('locker', $locker)
+            ->setParameter('now', $now)
+            ->orderBy('r.endsAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

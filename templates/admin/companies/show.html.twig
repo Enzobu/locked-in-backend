@@ -1,0 +1,68 @@
+{% extends 'admin/layout.html.twig' %}
+{% import 'macros/badge.html.twig' as label %}
+
+{% block title %}{{ company.name }}{% endblock %}
+
+{% block admin_content %}
+    <section class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-4">
+        <div>
+            <a class="link-secondary text-decoration-none" href="{{ path('app_admin_companies_index') }}">← Retour aux societes</a>
+            <h2 class="h3 mt-2 mb-1">{{ company.name }}</h2>
+            <p class="text-body-secondary mb-0">SIREN {{ company.siren }} - SIRET {{ company.siret }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-primary" href="{{ path('app_admin_companies_edit', {id: company.id}) }}">Modifier societe</a>
+            <form method="post" action="{{ path('app_admin_companies_delete', {id: company.id}) }}" onsubmit="return confirm('Supprimer cette societe ?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete_company_' ~ company.id) }}">
+                <button class="btn btn-outline-danger" type="submit">Supprimer societe</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="row g-3 mb-4">
+        <div class="col-12 col-lg-6">
+            <article class="card shadow-sm h-100">
+                <div class="card-header bg-transparent"><h3 class="h6 mb-0">Caracteristiques</h3></div>
+                <div class="card-body small">
+                    <p class="mb-2"><strong>Forme juridique:</strong> {{ company.juridicForm }}</p>
+                    <p class="mb-2"><strong>APE:</strong> {{ company.ape }}</p>
+                    <p class="mb-2"><strong>Telephone:</strong> {{ company.phone }}</p>
+                    <p class="mb-0"><strong>Adresse:</strong> {{ company.address.number }} {{ company.address.street }}, {{ company.address.city }}, {{ company.address.country }}</p>
+                </div>
+            </article>
+        </div>
+        <div class="col-12 col-lg-6">
+            <article class="card shadow-sm h-100">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h3 class="h6 mb-0">Baies de casiers</h3>
+                    {{ label.default(bays|length ~ ' baie(s)', 'secondary') }}
+                </div>
+                <div class="card-body">
+                    <a class="btn btn-primary mb-3" href="{{ path('app_admin_companies_locker_bays_new', {id: company.id}) }}">Ajouter une baie</a>
+                    {% if bays is empty %}
+                        <p class="text-body-secondary mb-0">Aucune baie rattachee.</p>
+                    {% else %}
+                        <div class="d-grid gap-2">
+                            {% for bay in bays %}
+                                <div class="border rounded p-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                    <div>
+                                        <p class="mb-1 fw-semibold">{{ bay.name }}</p>
+                                        <p class="text-body-secondary small mb-0">{{ bay.lockers|length }} casier(s)</p>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <a class="btn btn-sm btn-outline-secondary" href="{{ path('app_admin_locker_bays_show', {id: bay.id}) }}">Voir</a>
+                                        <a class="btn btn-sm btn-outline-primary" href="{{ path('app_admin_companies_locker_bays_edit', {id: bay.id}) }}">Modifier</a>
+                                        <form method="post" action="{{ path('app_admin_companies_locker_bays_delete', {id: bay.id}) }}" onsubmit="return confirm('Supprimer cette baie ?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete_bay_' ~ bay.id) }}">
+                                            <button class="btn btn-sm btn-outline-danger" type="submit">Supprimer</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </article>
+        </div>
+    </section>
+{% endblock %}

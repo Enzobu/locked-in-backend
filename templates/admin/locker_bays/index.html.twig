@@ -1,0 +1,83 @@
+{% extends 'admin/layout.html.twig' %}
+{% import 'macros/badge.html.twig' as label %}
+
+{% block title %}Baies de casiers{% endblock %}
+
+{% block admin_content %}
+    <section class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-4">
+        <div>
+            <h2 class="h3 mb-1">Baies de casiers</h2>
+            <p class="text-body-secondary mb-0">
+                {% if isAdmin %}
+                    Vue globale de toutes les baies de casiers.
+                {% else %}
+                    Vue des baies rattachees a votre societe.
+                {% endif %}
+            </p>
+        </div>
+        {{ label.default(bays|length ~ ' baie(s)', 'secondary') }}
+    </section>
+
+    <form class="row g-2 mb-4" method="get">
+        <div class="col-12 col-md-6 col-xl-4">
+            <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Rechercher une baie ou une societe">
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-outline-primary" type="submit">Rechercher</button>
+        </div>
+    </form>
+
+    <section class="row g-3">
+        {% for bay in bays %}
+            {% set total = bay.lockers|length %}
+            {% set available = 0 %}
+            {% set reserved = 0 %}
+            {% set occupied = 0 %}
+            {% set offline = 0 %}
+            {% set outOfOrder = 0 %}
+
+            {% for locker in bay.lockers %}
+                {% if locker.status.value == 'available' %}{% set available = available + 1 %}{% endif %}
+                {% if locker.status.value == 'reserved' %}{% set reserved = reserved + 1 %}{% endif %}
+                {% if locker.status.value == 'occupied' %}{% set occupied = occupied + 1 %}{% endif %}
+                {% if locker.status.value == 'offline' %}{% set offline = offline + 1 %}{% endif %}
+                {% if locker.status.value == 'out_of_order' %}{% set outOfOrder = outOfOrder + 1 %}{% endif %}
+            {% endfor %}
+
+            <div class="col-12 col-md-6 col-xl-4">
+                <a href="{{ path('app_admin_locker_bays_show', {id: bay.id}) }}" class="text-decoration-none text-body">
+                    <article class="card shadow-sm h-100 locker-bay-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start justify-content-between gap-2 mb-3">
+                                <div>
+                                    <h3 class="h5 mb-1">{{ bay.name }}</h3>
+                                    <p class="text-body-secondary mb-0">{{ bay.company.name }}</p>
+                                </div>
+                                {{ label.emphasis(total ~ ' casiers', 'primary') }}
+                            </div>
+
+                            <div class="small text-body-secondary mb-3">
+                                <div>Lat: {{ bay.latitude }} / Lng: {{ bay.longitude }}</div>
+                                <div>Min: {{ bay.minDuration ?? '-' }} min / Max: {{ bay.maxDuration ?? '-' }} min</div>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                {{ label.default(available ~ ' dispo', 'success') }}
+                                {{ label.default(reserved ~ ' reserves') }}
+                                {{ label.default(occupied ~ ' occupes', 'warning') }}
+                                {{ label.default(offline ~ ' offline', 'danger') }}
+                                {{ label.default(outOfOrder ~ ' HS', 'dark') }}
+                            </div>
+                        </div>
+                    </article>
+                </a>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body text-body-secondary">Aucune baie de casiers trouvee.</div>
+                </div>
+            </div>
+        {% endfor %}
+    </section>
+{% endblock %}

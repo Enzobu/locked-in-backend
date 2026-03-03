@@ -91,6 +91,10 @@ label.required:after {
 }
 
 @import "../../vendor/twbs/bootstrap/scss/functions";
+
+$font-family-sans-serif: "Poppins", sans-serif;
+$headings-font-family: "Poppins", sans-serif;
+
 @import "../../vendor/twbs/bootstrap/scss/variables";
 @import "../../vendor/twbs/bootstrap/scss/maps";
 @import "../../vendor/twbs/bootstrap/scss/mixins";
@@ -158,6 +162,34 @@ label.required:after {
 
 .dashboard-kpi {
   border: 1px solid var(--bs-border-color);
+}
+
+.locker-bay-card,
+.locker-card {
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.locker-bay-card:hover,
+.locker-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.08);
+}
+
+.locker-status-available {
+  border-top: 3px solid rgba(22, 163, 74, 0.75);
+}
+
+.locker-status-reserved {
+  border-top: 3px solid rgba(37, 99, 235, 0.75);
+}
+
+.locker-status-occupied {
+  border-top: 3px solid rgba(217, 119, 6, 0.75);
+}
+
+.locker-status-offline,
+.locker-status-out_of_order {
+  border-top: 3px solid rgba(220, 38, 38, 0.75);
 }
 
 .login-body {

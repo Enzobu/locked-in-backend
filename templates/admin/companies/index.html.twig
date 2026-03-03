@@ -1,0 +1,42 @@
+{% extends 'admin/layout.html.twig' %}
+{% import 'macros/badge.html.twig' as label %}
+
+{% block title %}Societes{% endblock %}
+
+{% block admin_content %}
+    <section class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-4">
+        <div>
+            <h2 class="h3 mb-1">Societes</h2>
+            <p class="text-body-secondary mb-0">Section reservee aux administrateurs.</p>
+        </div>
+        <a href="{{ path('app_admin_companies_new') }}" class="btn btn-primary">Nouvelle societe</a>
+    </section>
+
+    <form class="row g-2 mb-4" method="get">
+        <div class="col-12 col-md-6 col-xl-4">
+            <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Rechercher nom, SIREN, SIRET">
+        </div>
+        <div class="col-auto"><button class="btn btn-outline-primary" type="submit">Rechercher</button></div>
+    </form>
+
+    <section class="row g-3">
+        {% for company in companies %}
+            <div class="col-12 col-md-6 col-xl-4">
+                <a href="{{ path('app_admin_companies_show', {id: company.id}) }}" class="text-decoration-none text-body">
+                    <article class="card shadow-sm h-100 locker-bay-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                <h3 class="h5 mb-0">{{ company.name }}</h3>
+                                {{ label.emphasis(company.lockerBays|length ~ ' baies', 'primary') }}
+                            </div>
+                            <p class="small text-body-secondary mb-1">SIREN: {{ company.siren }}</p>
+                            <p class="small text-body-secondary mb-0">{{ company.address.number }} {{ company.address.street }}, {{ company.address.city }}</p>
+                        </div>
+                    </article>
+                </a>
+            </div>
+        {% else %}
+            <div class="col-12"><div class="card shadow-sm"><div class="card-body text-body-secondary">Aucune societe trouvee.</div></div></div>
+        {% endfor %}
+    </section>
+{% endblock %}

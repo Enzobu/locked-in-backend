@@ -1,0 +1,31 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block admin_content %}
+    <section class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-4">
+        <div>
+            <h2 class="h3 mb-1">{{ title }}</h2>
+            <p class="text-body-secondary mb-0">Societe: {{ company.name }}</p>
+        </div>
+        <a href="{{ path('app_admin_companies_show', {id: company.id}) }}" class="btn btn-outline-secondary">Retour societe</a>
+    </section>
+
+    <article class="card shadow-sm">
+        <div class="card-body">
+            {{ form_start(form) }}
+            <div class="row g-3">
+                <div class="col-12 col-md-6">{{ form_row(form.name) }}</div>
+                <div class="col-12 col-md-3">{{ form_row(form.latitude) }}</div>
+                <div class="col-12 col-md-3">{{ form_row(form.longitude) }}</div>
+                <div class="col-12 col-md-6">{{ form_row(form.minDuration) }}</div>
+                <div class="col-12 col-md-6">{{ form_row(form.maxDuration) }}</div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button class="btn btn-primary" type="submit">{{ submitLabel }}</button>
+                <a href="{{ path('app_admin_companies_show', {id: company.id}) }}" class="btn btn-outline-secondary">Annuler</a>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </article>
+{% endblock %}
