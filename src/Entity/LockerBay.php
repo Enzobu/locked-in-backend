@@ -7,9 +7,10 @@ use App\Repository\LockerBayRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: LockerBayRepository::class)]
-#[ApiResource]
+#[ApiResource(normalizationContext: ['groups' => ['locker_bay:read']])]
 #[ORM\Table(uniqueConstraints: [
     new ORM\UniqueConstraint(name: 'uniq_company_locker_bay_name', columns: ['company_id', 'name']),
 ])]
@@ -19,37 +20,47 @@ class LockerBay
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['locker_bay:read', 'locker:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['locker_bay:read', 'locker:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 7)]
+    #[Groups(['locker_bay:read', 'locker:read'])]
     private ?string $latitude = null;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 7)]
+    #[Groups(['locker_bay:read', 'locker:read'])]
     private ?string $longitude = null;
 
     #[ORM\ManyToOne(inversedBy: 'lockerBays')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['locker_bay:read'])]
     private ?Company $company = null;
 
     /**
      * @var Collection<int, Locker>
      */
     #[ORM\OneToMany(targetEntity: Locker::class, mappedBy: 'lockerBay')]
+    #[Groups(['locker_bay:read'])]
     private Collection $lockers;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['locker_bay:read'])]
     private ?int $maxDuration = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['locker_bay:read'])]
     private ?int $minDuration = null;
 
     #[ORM\Column]
+    #[Groups(['locker_bay:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
+    #[Groups(['locker_bay:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()

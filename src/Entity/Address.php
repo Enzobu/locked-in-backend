@@ -7,6 +7,7 @@ use App\Repository\AddressRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: AddressRepository::class)]
 #[ApiResource]
@@ -15,21 +16,27 @@ class Address
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['locker_bay:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 20, nullable: true)]
+    #[Groups(['locker_bay:read'])]
     private ?string $number = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['locker_bay:read'])]
     private ?string $city = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['locker_bay:read'])]
     private ?string $country = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['locker_bay:read'])]
     private ?string $street = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['locker_bay:read'])]
     private ?string $complement = null;
 
     /**
@@ -99,18 +106,6 @@ class Address
     public function setStreet(string $street): static
     {
         $this->street = $street;
-
-        return $this;
-    }
-
-    public function getAddress(): ?string
-    {
-        return $this->street;
-    }
-
-    public function setAddress(string $address): static
-    {
-        $this->street = $address;
 
         return $this;
     }

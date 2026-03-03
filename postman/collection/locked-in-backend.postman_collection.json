@@ -93,6 +93,115 @@
       }
     },
     {
+      "name": "GET Endpoints",
+      "item": [
+        {
+          "name": "Get addresses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{apiPrefix}}/addresses"
+          }
+        },
+        {
+          "name": "Get address by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{apiPrefix}}/addresses/{{addressId}}"
+          }
+        },
+        {
+          "name": "Get companies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{apiPrefix}}/companies"
+          }
+        },
+        {
+          "name": "Get specifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{apiPrefix}}/specifications"
+          }
+        },
+        {
+          "name": "Get locker bays",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{apiPrefix}}/locker_bays"
+          }
+        },
+        {
+          "name": "Get locker bay by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{apiPrefix}}/locker_bays/{{lockerBayId}}"
+          }
+        },
+        {
+          "name": "Get lockers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{apiPrefix}}/lockers"
+          }
+        },
+        {
+          "name": "Get lockers by locker bay",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{apiPrefix}}/lockers?lockerBay={{apiPrefix}}/locker_bays/{{lockerBayId}}"
+          }
+        },
+        {
+          "name": "Get locker by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{apiPrefix}}/lockers/{{lockerId}}"
+          }
+        },
+        {
+          "name": "Get customers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{apiPrefix}}/customers"
+          }
+        },
+        {
+          "name": "Get reservations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{apiPrefix}}/reservations"
+          }
+        },
+        {
+          "name": "Get locker actions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{apiPrefix}}/locker_actions"
+          }
+        },
+        {
+          "name": "Get locker events",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{apiPrefix}}/locker_events"
+          }
+        }
+      ]
+    },
+    {
       "name": "Authentication",
       "item": [
         {

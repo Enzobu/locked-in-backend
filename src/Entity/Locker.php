@@ -8,9 +8,10 @@ use App\Repository\LockerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: LockerRepository::class)]
-#[ApiResource]
+#[ApiResource(normalizationContext: ['groups' => ['locker:read']])]
 #[ORM\Table(uniqueConstraints: [
     new ORM\UniqueConstraint(name: 'uniq_locker_bay_number', columns: ['locker_bay_id', 'number']),
     new ORM\UniqueConstraint(name: 'uniq_locker_hardware_id', columns: ['hardware_id']),
@@ -21,35 +22,45 @@ class Locker
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['locker:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['locker:read'])]
     private ?int $number = null;
 
     #[ORM\Column(length: 64, nullable: true)]
+    #[Groups(['locker:read'])]
     private ?string $hardwareId = null;
 
     #[ORM\ManyToOne(inversedBy: 'lockers')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['locker:read'])]
     private ?Specification $specification = null;
 
     #[ORM\Column]
+    #[Groups(['locker:read'])]
     private ?int $priceCents = null;
 
     #[ORM\ManyToOne(inversedBy: 'lockers')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['locker:read'])]
     private ?LockerBay $lockerBay = null;
 
     #[ORM\Column(length: 50, enumType: LockerStatus::class)]
+    #[Groups(['locker:read'])]
     private LockerStatus $status = LockerStatus::AVAILABLE;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['locker:read'])]
     private ?\DateTimeImmutable $lastSeenAt = null;
 
     #[ORM\Column]
+    #[Groups(['locker:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
+    #[Groups(['locker:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     /**
@@ -116,18 +127,6 @@ class Locker
     public function setPriceCents(int $priceCents): static
     {
         $this->priceCents = $priceCents;
-
-        return $this;
-    }
-
-    public function getPrice(): ?int
-    {
-        return $this->priceCents;
-    }
-
-    public function setPrice(int $price): static
-    {
-        $this->priceCents = $price;
 
         return $this;
     }
