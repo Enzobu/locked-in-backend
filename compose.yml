@@ -14,8 +14,8 @@ services:
       - database_data:/var/lib/mysql
     networks:
       - locked-in_network
-    ports:
-      - 3306:3306
+    expose:
+      - 3306
     restart: unless-stopped
   ###< doctrine/doctrine-bundle ###
 

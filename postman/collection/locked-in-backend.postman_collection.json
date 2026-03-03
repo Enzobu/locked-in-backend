@@ -24,6 +24,14 @@
       "value": "{{apiPrefix}}"
     },
     {
+      "key": "customerEmail",
+      "value": "lea.dupont@example.com"
+    },
+    {
+      "key": "customerPassword",
+      "value": "customer1234"
+    },
+    {
       "key": "addressId",
       "value": "1"
     },
@@ -63,6 +71,51 @@
         "header": [],
         "url": "{{baseUrl}}{{apiPrefix}}"
       }
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Customer login (JWT)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"{{customerPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}{{apiPrefix}}/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('JWT token present', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  var data = pm.response.json();",
+                  "  pm.expect(data).to.have.property('token');",
+                  "});",
+                  "",
+                  "var json = pm.response.json();",
+                  "if (json && json.token) {",
+                  "  pm.environment.set('bearerToken', json.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "Addresses",
