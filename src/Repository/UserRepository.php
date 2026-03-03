@@ -33,28 +33,23 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
-    //    /**
-    //     * @return User[] Returns an array of User objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('u.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return User[]
+     */
+    public function searchByDeletionStatus(bool $deleted, ?string $q = null): array
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->leftJoin('u.company', 'c')->addSelect('c')
+            ->andWhere('u.isDeleted = :deleted')
+            ->setParameter('deleted', $deleted)
+            ->orderBy('u.createdAt', 'DESC');
 
-    //    public function findOneBySomeField($value): ?User
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($q !== null && trim($q) !== '') {
+            $qb
+                ->andWhere('LOWER(u.email) LIKE :q OR LOWER(u.firstname) LIKE :q OR LOWER(u.lastname) LIKE :q OR LOWER(c.name) LIKE :q')
+                ->setParameter('q', '%'.mb_strtolower(trim($q)).'%');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

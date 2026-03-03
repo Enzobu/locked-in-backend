@@ -16,28 +16,24 @@ class CustomerRepository extends ServiceEntityRepository
         parent::__construct($registry, Customer::class);
     }
 
-    //    /**
-    //     * @return Customer[] Returns an array of Customer objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return Customer[]
+     */
+    public function searchByDeletionStatus(bool $deleted, ?string $q = null): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->select('DISTINCT c, a')
+            ->leftJoin('c.addresses', 'a')->addSelect('a')
+            ->andWhere('c.isDeleted = :deleted')
+            ->setParameter('deleted', $deleted)
+            ->orderBy('c.createdAt', 'DESC');
 
-    //    public function findOneBySomeField($value): ?Customer
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($q !== null && trim($q) !== '') {
+            $qb
+                ->andWhere('LOWER(c.email) LIKE :q OR LOWER(c.firstname) LIKE :q OR LOWER(c.lastname) LIKE :q OR LOWER(a.city) LIKE :q')
+                ->setParameter('q', '%'.mb_strtolower(trim($q)).'%');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

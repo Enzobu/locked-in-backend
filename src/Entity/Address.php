@@ -39,11 +39,8 @@ class Address
     #[Groups(['locker_bay:read'])]
     private ?string $complement = null;
 
-    /**
-     * @var Collection<int, Customer>
-     */
-    #[ORM\OneToMany(targetEntity: Customer::class, mappedBy: 'address')]
-    private Collection $customers;
+    #[ORM\ManyToOne(inversedBy: 'addresses')]
+    private ?Customer $customer = null;
 
     /**
      * @var Collection<int, Company>
@@ -53,7 +50,6 @@ class Address
 
     public function __construct()
     {
-        $this->customers = new ArrayCollection();
         $this->companies = new ArrayCollection();
     }
 
@@ -148,32 +144,14 @@ class Address
         return $this;
     }
 
-    /**
-     * @return Collection<int, Customer>
-     */
-    public function getCustomers(): Collection
+    public function getCustomer(): ?Customer
     {
-        return $this->customers;
+        return $this->customer;
     }
 
-    public function addCustomer(Customer $customer): static
+    public function setCustomer(?Customer $customer): static
     {
-        if (!$this->customers->contains($customer)) {
-            $this->customers->add($customer);
-            $customer->setAddress($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCustomer(Customer $customer): static
-    {
-        if ($this->customers->removeElement($customer)) {
-            // set the owning side to null (unless already changed)
-            if ($customer->getAddress() === $this) {
-                $customer->setAddress(null);
-            }
-        }
+        $this->customer = $customer;
 
         return $this;
     }

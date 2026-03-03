@@ -80,8 +80,9 @@ class ApiRegisterController extends AbstractController
             ->setFirstname((string) $payload['firstname'])
             ->setLastname((string) $payload['lastname'])
             ->setBirthDate($birthDate)
-            ->setAddress($address)
             ->setRoles(['ROLE_CUSTOMER']);
+
+        $customer->addAddress($address);
 
         $customer->setPassword($passwordHasher->hashPassword($customer, $password));
 
