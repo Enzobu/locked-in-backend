@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use App\Controller\ApiCustomerMeController;
 use App\Controller\ApiRegisterController;
 use App\Repository\CustomerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -19,6 +20,17 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
 #[ApiResource(operations: [
+    new Get(
+        uriTemplate: '/customers/me',
+        controller: ApiCustomerMeController::class,
+        name: 'api_customer_me',
+        read: false,
+        output: false,
+        openapi: new OpenApiOperation(
+            summary: 'Get current authenticated customer profile',
+            description: 'Returns the profile of the customer associated with the JWT token.',
+        ),
+    ),
     new Get(),
     new GetCollection(),
     new Post(),
