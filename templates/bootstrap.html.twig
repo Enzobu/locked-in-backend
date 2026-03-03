@@ -1,0 +1,645 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Backoffice{% endblock %}
+
+{% block body %}
+  <div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between gap-3 mb-4">
+      <div>
+        <h1 class="mb-1">Bootstrap “kitchen sink”</h1>
+        <p class="mb-0 text-body-secondary">Une page qui affiche un peu tout ce que Bootstrap propose.</p>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <button id="themeToggle" class="btn btn-outline-secondary">Toggle theme</button>
+
+        <div class="dropdown">
+          <button class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            Dropdown
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#typography">Typography</a></li>
+            <li><a class="dropdown-item" href="#grid">Grid</a></li>
+            <li><a class="dropdown-item" href="#components">Components</a></li>
+            <li><a class="dropdown-item" href="#forms">Forms</a></li>
+          </ul>
+        </div>
+
+        <button class="btn btn-success" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDemo">Offcanvas</button>
+        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalDemo">Modal</button>
+      </div>
+    </div>
+
+    <div class="alert alert-info d-flex align-items-center justify-content-between" role="alert">
+      <div>
+        <strong>Tip :</strong> Clique sur “Toggle theme” pour passer light/dark.
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-12 col-lg-3">
+        <div class="position-sticky sticky-top-demo">
+          <div class="demo-block">
+            <div class="demo-title mb-2">Navigation</div>
+            <div class="list-group">
+              <a class="list-group-item list-group-item-action" href="#typography">Typography & colors</a>
+              <a class="list-group-item list-group-item-action" href="#grid">Grid & flex</a>
+              <a class="list-group-item list-group-item-action" href="#cards">Cards</a>
+              <a class="list-group-item list-group-item-action" href="#components">Components</a>
+              <a class="list-group-item list-group-item-action" href="#tables">Tables</a>
+              <a class="list-group-item list-group-item-action" href="#forms">Forms</a>
+              <a class="list-group-item list-group-item-action" href="#utilities">Utilities</a>
+            </div>
+
+            <hr class="my-3" />
+
+            <div class="demo-title mb-2">Toasts</div>
+            <button id="showToast" class="btn btn-outline-primary w-100">Show toast</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-9">
+        <section id="typography" class="mb-4">
+          <div class="demo-block">
+            <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+              <h2 class="h4 mb-0">Typography & colors</h2>
+              <span class="badge text-bg-secondary">Text / badges / links</span>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <h1 class="h3">Heading h3</h1>
+                <p class="lead">Lead text. Lorem ipsum dolor sit amet.</p>
+                <p class="mb-2">
+                  Texte normal avec <a href="#">un lien</a>,
+                  <mark>un highlight</mark>,
+                  <del>du barré</del>,
+                  <u>souligné</u>,
+                  <small class="text-body-secondary">small muted</small>.
+                </p>
+
+                <div class="d-flex flex-wrap gap-2">
+                  <span class="badge text-bg-primary">primary</span>
+                  <span class="badge text-bg-secondary">secondary</span>
+                  <span class="badge text-bg-success">success</span>
+                  <span class="badge text-bg-danger">danger</span>
+                  <span class="badge text-bg-warning">warning</span>
+                  <span class="badge text-bg-info">info</span>
+                  <span class="badge text-bg-light">light</span>
+                  <span class="badge text-bg-dark">dark</span>
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <div class="demo-title mb-2">Text colors</div>
+                <div class="d-grid gap-1">
+                  <div class="text-primary">text-primary</div>
+                  <div class="text-secondary">text-secondary</div>
+                  <div class="text-success">text-success</div>
+                  <div class="text-danger">text-danger</div>
+                  <div class="text-warning">text-warning</div>
+                  <div class="text-info">text-info</div>
+                  <div class="text-body">text-body</div>
+                  <div class="text-body-secondary">text-body-secondary</div>
+                  <div class="text-muted">text-muted</div>
+                </div>
+
+                <hr class="my-3" />
+
+                <div class="demo-title mb-2">Backgrounds</div>
+                <div class="d-grid gap-2">
+                  <div class="p-2 rounded text-bg-primary">text-bg-primary</div>
+                  <div class="p-2 rounded text-bg-success">text-bg-success</div>
+                  <div class="p-2 rounded text-bg-warning">text-bg-warning</div>
+                  <div class="p-2 rounded text-bg-danger">text-bg-danger</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="grid" class="mb-4">
+          <div class="demo-block">
+            <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+              <h2 class="h4 mb-0">Grid & flex</h2>
+              <span class="badge text-bg-info">row / col / flex</span>
+            </div>
+
+            <div class="demo-title mb-2">Grid</div>
+            <div class="row g-2 mb-3">
+              <div class="col-12 col-md-4">
+                <div class="p-3 bg-body-tertiary rounded">col-12 col-md-4</div>
+              </div>
+              <div class="col-12 col-md-4">
+                <div class="p-3 bg-body-tertiary rounded">col-12 col-md-4</div>
+              </div>
+              <div class="col-12 col-md-4">
+                <div class="p-3 bg-body-tertiary rounded">col-12 col-md-4</div>
+              </div>
+            </div>
+
+            <div class="demo-title mb-2">Flex + gap + align</div>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <div class="p-2 bg-body-tertiary rounded">Item A</div>
+              <div class="p-2 bg-body-tertiary rounded">Item B</div>
+              <div class="p-2 bg-body-tertiary rounded">Item C</div>
+              <div class="ms-auto d-flex gap-2">
+                <button class="btn btn-outline-primary btn-sm">btn-sm</button>
+                <button class="btn btn-outline-primary btn-lg">btn-lg</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="cards" class="mb-4">
+          <div class="demo-block">
+            <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+              <h2 class="h4 mb-0">Cards</h2>
+              <span class="badge text-bg-primary">cards</span>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <div class="card shadow-sm">
+                  <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Card header</span>
+                    <span class="badge text-bg-success">New</span>
+                  </div>
+                  <div class="card-body">
+                    <h5 class="card-title">Card title</h5>
+                    <p class="card-text demo-muted">
+                      Exemple de card avec boutons, list-group et footer.
+                    </p>
+                    <div class="d-flex gap-2">
+                      <button class="btn btn-primary">Primary</button>
+                      <button class="btn btn-outline-secondary">Outline</button>
+                      <button class="btn btn-danger" data-bs-toggle="popover" data-bs-title="Popover title"
+                        data-bs-content="Hello popover.">Popover</button>
+                    </div>
+                  </div>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">List item 1</li>
+                    <li class="list-group-item">List item 2</li>
+                    <li class="list-group-item">List item 3</li>
+                  </ul>
+                  <div class="card-footer text-body-secondary">
+                    Card footer text
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <div class="card shadow-sm">
+                  <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                      <h5 class="card-title mb-0">Card with progress</h5>
+                      <span class="badge text-bg-warning">75%</span>
+                    </div>
+                    <p class="card-text mt-2 mb-3 demo-muted">
+                      Progress bars + buttons group.
+                    </p>
+
+                    <div class="progress mb-2" role="progressbar" aria-label="progress" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                      <div class="progress-bar" style="width: 75%"></div>
+                    </div>
+
+                    <div class="btn-group w-100" role="group" aria-label="buttons group">
+                      <button class="btn btn-outline-primary">Left</button>
+                      <button class="btn btn-outline-primary">Middle</button>
+                      <button class="btn btn-outline-primary">Right</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card shadow-sm mt-3">
+                  <div class="card-body">
+                    <h5 class="card-title">Card “image” placeholder</h5>
+                    <div class="ratio ratio-16x9 bg-body-tertiary rounded d-flex align-items-center justify-content-center">
+                      <span class="text-body-secondary">16:9 ratio</span>
+                    </div>
+                    <p class="card-text mt-3 mb-0 demo-muted">Utilise ratio-* pour les médias.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="components" class="mb-4">
+          <div class="demo-block">
+            <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+              <h2 class="h4 mb-0">Components</h2>
+              <span class="badge text-bg-secondary">alerts / accordion / nav / pagination</span>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <div class="demo-title mb-2">Accordion</div>
+                <div class="accordion" id="accDemo">
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accOne">
+                        Accordion item 1
+                      </button>
+                    </h2>
+                    <div id="accOne" class="accordion-collapse collapse show" data-bs-parent="#accDemo">
+                      <div class="accordion-body">
+                        Contenu 1
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accTwo">
+                        Accordion item 2
+                      </button>
+                    </h2>
+                    <div id="accTwo" class="accordion-collapse collapse" data-bs-parent="#accDemo">
+                      <div class="accordion-body">
+                        Contenu 2
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <hr class="my-3" />
+
+                <div class="demo-title mb-2">Nav tabs</div>
+                <ul class="nav nav-tabs" id="tabsDemo" role="tablist">
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabA" type="button" role="tab">Tab A</button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabB" type="button" role="tab">Tab B</button>
+                  </li>
+                </ul>
+                <div class="tab-content border border-top-0 rounded-bottom p-3">
+                  <div class="tab-pane fade show active" id="tabA" role="tabpanel">
+                    Contenu Tab A
+                  </div>
+                  <div class="tab-pane fade" id="tabB" role="tabpanel">
+                    Contenu Tab B
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <div class="demo-title mb-2">Buttons</div>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                  <button class="btn btn-primary">btn-primary</button>
+                  <button class="btn btn-secondary">btn-secondary</button>
+                  <button class="btn btn-success">btn-success</button>
+                  <button class="btn btn-danger">btn-danger</button>
+                  <button class="btn btn-warning">btn-warning</button>
+                  <button class="btn btn-info">btn-info</button>
+                  <button class="btn btn-light">btn-light</button>
+                  <button class="btn btn-dark">btn-dark</button>
+                  <button class="btn btn-outline-primary">outline</button>
+                  <button class="btn btn-primary disabled" aria-disabled="true">disabled</button>
+                </div>
+
+                <div class="demo-title mb-2">Spinners</div>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="spinner-border" role="status" aria-label="spinner"></div>
+                  <div class="spinner-grow" role="status" aria-label="spinner"></div>
+                  <button class="btn btn-primary" type="button" disabled>
+                    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                    Loading...
+                  </button>
+                </div>
+
+                <div class="demo-title mb-2">Pagination</div>
+                <nav aria-label="Pagination demo">
+                  <ul class="pagination mb-0">
+                    <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                  </ul>
+                </nav>
+
+                <hr class="my-3" />
+
+                <div class="demo-title mb-2">Breadcrumb</div>
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item"><a href="#">Library</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Data</li>
+                  </ol>
+                </nav>
+              </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <div class="demo-title mb-2">Badges + tooltips</div>
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                  <span class="badge rounded-pill text-bg-primary" data-bs-toggle="tooltip" data-bs-title="Tooltip on badge">
+                    Pill badge
+                  </span>
+                  <button class="btn btn-outline-secondary" data-bs-toggle="tooltip" data-bs-title="Tooltip on button">
+                    Hover me
+                  </button>
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <div class="demo-title mb-2">List group (active/disabled)</div>
+                <div class="list-group">
+                  <a href="#" class="list-group-item list-group-item-action active" aria-current="true">Active item</a>
+                  <a href="#" class="list-group-item list-group-item-action">Normal item</a>
+                  <a class="list-group-item list-group-item-action disabled" aria-disabled="true">Disabled item</a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <section id="tables" class="mb-4">
+          <div class="demo-block">
+            <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+              <h2 class="h4 mb-0">Tables</h2>
+              <span class="badge text-bg-dark">table / striped / hover / responsive</span>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>Alpha</td>
+                    <td><span class="badge text-bg-success">OK</span></td>
+                    <td class="text-end">
+                      <button class="btn btn-sm btn-outline-primary">Edit</button>
+                      <button class="btn btn-sm btn-outline-danger">Delete</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>Beta</td>
+                    <td><span class="badge text-bg-warning">Pending</span></td>
+                    <td class="text-end">
+                      <button class="btn btn-sm btn-outline-primary">Edit</button>
+                      <button class="btn btn-sm btn-outline-danger">Delete</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>Gamma</td>
+                    <td><span class="badge text-bg-danger">Fail</span></td>
+                    <td class="text-end">
+                      <button class="btn btn-sm btn-outline-primary">Edit</button>
+                      <button class="btn btn-sm btn-outline-danger">Delete</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </section>
+
+        <section id="forms" class="mb-4">
+          <div class="demo-block">
+            <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+              <h2 class="h4 mb-0">Forms</h2>
+              <span class="badge text-bg-success">inputs / selects / checks / validation</span>
+            </div>
+
+            <form class="row g-3 needs-validation" novalidate>
+              <div class="col-md-6">
+                <label for="inputEmail" class="form-label">Email</label>
+                <input id="inputEmail" type="email" class="form-control" placeholder="name@example.com" required />
+                <div class="invalid-feedback">Email requis.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="inputPassword" class="form-label">Password</label>
+                <input id="inputPassword" type="password" class="form-control" required />
+                <div class="invalid-feedback">Mot de passe requis.</div>
+              </div>
+
+              <div class="col-12">
+                <label for="inputText" class="form-label">Text</label>
+                <input id="inputText" type="text" class="form-control" placeholder="Un texte" />
+                <div class="form-text">Helper text</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="selectDemo" class="form-label">Select</label>
+                <select id="selectDemo" class="form-select" required>
+                  <option value="" selected disabled>Choisir...</option>
+                  <option>Option 1</option>
+                  <option>Option 2</option>
+                  <option>Option 3</option>
+                </select>
+                <div class="invalid-feedback">Choisis une option.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="datalistDemo" class="form-label">Datalist</label>
+                <input class="form-control" list="datalistOptions" id="datalistDemo" placeholder="Tape pour chercher..." />
+                <datalist id="datalistOptions">
+                  <option value="Symfony"></option>
+                  <option value="React"></option>
+                  <option value="Docker"></option>
+                  <option value="Grafana"></option>
+                </datalist>
+              </div>
+
+              <div class="col-12">
+                <label for="textareaDemo" class="form-label">Textarea</label>
+                <textarea id="textareaDemo" class="form-control" rows="3" placeholder="Du texte long..."></textarea>
+              </div>
+
+              <div class="col-md-6">
+                <label for="fileDemo" class="form-label">File input</label>
+                <input class="form-control" type="file" id="fileDemo" />
+              </div>
+
+              <div class="col-md-6">
+                <label for="rangeDemo" class="form-label">Range</label>
+                <input type="range" class="form-range" min="0" max="100" id="rangeDemo" />
+              </div>
+
+              <div class="col-md-6">
+                <div class="demo-title mb-1">Checkbox</div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="check1" />
+                  <label class="form-check-label" for="check1">Check me</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="check2" checked />
+                  <label class="form-check-label" for="check2">Checked</label>
+                </div>
+                <div class="form-check form-switch mt-2">
+                  <input class="form-check-input" type="checkbox" role="switch" id="switch1" checked />
+                  <label class="form-check-label" for="switch1">Switch</label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="demo-title mb-1">Radio</div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="radioDemo" id="radio1" checked />
+                  <label class="form-check-label" for="radio1">Radio 1</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="radioDemo" id="radio2" />
+                  <label class="form-check-label" for="radio2">Radio 2</label>
+                </div>
+
+                <div class="demo-title mt-3 mb-1">Input group</div>
+                <div class="input-group">
+                  <span class="input-group-text">@</span>
+                  <input type="text" class="form-control" placeholder="username" />
+                  <button class="btn btn-outline-secondary" type="button">Go</button>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="demo-title mb-1">Floating labels</div>
+                <div class="row g-2">
+                  <div class="col-md-6 form-floating">
+                    <input type="text" class="form-control" id="float1" placeholder="Name" />
+                    <label for="float1">Name</label>
+                  </div>
+                  <div class="col-md-6 form-floating">
+                    <input type="email" class="form-control" id="float2" placeholder="Email" />
+                    <label for="float2">Email</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="demo-title mb-1">Buttons + validation</div>
+                <div class="d-flex flex-wrap gap-2">
+                  <button class="btn btn-primary" type="submit">Submit</button>
+                  <button class="btn btn-outline-secondary" type="reset">Reset</button>
+                  <button class="btn btn-outline-danger" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDemo">
+                    Collapse
+                  </button>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="collapse" id="collapseDemo">
+                  <div class="alert alert-warning mb-0">
+                    Ceci est un contenu dans un collapse.
+                  </div>
+                </div>
+              </div>
+            </form>
+
+          </div>
+        </section>
+
+        <section id="utilities" class="mb-4">
+          <div class="demo-block">
+            <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+              <h2 class="h4 mb-0">Utilities</h2>
+              <span class="badge text-bg-warning">spacing / borders / shadows / overflow</span>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <div class="demo-title mb-2">Spacing / borders / shadows</div>
+                <div class="p-3 mb-2 bg-body-tertiary rounded border">border + rounded</div>
+                <div class="p-3 mb-2 bg-body-tertiary rounded shadow-sm">shadow-sm</div>
+                <div class="p-3 mb-2 bg-body-tertiary rounded shadow">shadow</div>
+                <div class="p-3 bg-body-tertiary rounded shadow-lg">shadow-lg</div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <div class="demo-title mb-2">Overflow scroll</div>
+                <div class="scroll-demo bg-body-tertiary rounded p-3">
+                  <p class="mb-2">Scroll area</p>
+                  <p class="mb-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                  <p class="mb-2">Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                  <p class="mb-2">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+                  <p class="mb-2">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.</p>
+                  <p class="mb-2">Excepteur sint occaecat cupidatat non proident.</p>
+                  <p class="mb-0">Fin.</p>
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <div class="demo-title mb-2">Progress multi</div>
+            <div class="progress mb-2" role="progressbar" aria-label="multi" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+              <div class="progress-bar" style="width: 20%"></div>
+              <div class="progress-bar bg-success" style="width: 40%"></div>
+            </div>
+
+            <div class="demo-title mb-2">Placeholders</div>
+            <p aria-hidden="true">
+              <span class="placeholder col-6"></span>
+            </p>
+            <a class="btn btn-primary disabled placeholder col-4" aria-disabled="true"></a>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="toastDemo" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Toast</strong>
+        <small class="text-body-secondary">now</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        Hello from Bootstrap toast.
+      </div>
+    </div>
+  </div>
+
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasDemo" aria-labelledby="offcanvasDemoLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasDemoLabel">Offcanvas</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <p class="mb-2">Contenu offcanvas.</p>
+      <div class="d-grid gap-2">
+        <button class="btn btn-outline-primary">Action</button>
+        <button class="btn btn-outline-secondary">Action</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalDemo" tabindex="-1" aria-labelledby="modalDemoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalDemoLabel">Modal demo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Hello modal. Tu peux fermer avec le bouton ou la touche ESC.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
