@@ -205,6 +205,10 @@ $headings-font-family: "Poppins", sans-serif;
   align-items: center;
 }
 
+.login-shell > .row {
+  width: 100%;
+}
+
 // Variables pour le thème sombre dans media query (prefers-color-scheme: dark)
 @media (prefers-color-scheme: dark) {
   $body-bg: #111827 !default;
