@@ -1,0 +1,178 @@
+// app.scss
+
+// Mode de détection du thème via media-query (préférence système)
+$color-mode-type: media-query;
+
+// Variables Bootstrap - Mode clair (light) - par défaut
+
+$body-bg: #ffffff;
+$body-color: #111827;
+
+$primary: #2563eb;
+$primary-hover: #1d4ed8;
+
+$success: #16a34a;
+$success-hover: #15803d;
+
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-800: #1f2937;
+$gray-900: #111827;
+
+$red-50: #fef2f2;
+$red-300: #fca5a5;
+$red-400: #f87171;
+$red-600: #dc2626;
+$red-700: #b91c1c;
+$red-800: #991b1b;
+
+$amber-400: #fbbf24;
+$amber-600: #d97706;
+
+// Bordures light
+$border-color: #e5e7eb;
+
+// Tooltip
+$tooltip-color: #ffffff;
+$tooltip-bg: $primary;
+
+// Ombres activées
+$enable-shadows: true;
+
+// Custom
+.sidebar-btn-active {
+  background: rgba(30, 79, 188, 0.045);
+
+  @media (prefers-color-scheme: dark) {
+    background: rgba(150, 180, 245, 0.045);
+  }
+}
+
+.sidebar-btn:hover {
+  background: rgba(30, 79, 188, 0.09);
+
+  @media (prefers-color-scheme: dark) {
+    background: rgba(150, 180, 245, 0.09);
+  }
+}.sidebar-btn-active {
+  background: rgba(30, 79, 188, 0.045);
+
+  @media (prefers-color-scheme: dark) {
+    background: rgba(150, 180, 245, 0.045);
+  }
+}
+
+.sidebar-btn:hover {
+  background: rgba(30, 79, 188, 0.09);
+
+  @media (prefers-color-scheme: dark) {
+    background: rgba(150, 180, 245, 0.09);
+  }
+}
+
+.h-full {
+    height: 100vh;
+}
+
+.h-fit-content {
+    height: calc(100vh - 93px);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.card {
+  border-radius: .75rem;
+}
+
+.card-header {
+  border-top-left-radius: .75rem;
+  border-top-right-radius: .75rem;
+}
+
+.border.rounded {
+  border-radius: .75rem;
+}
+
+label.required:after {
+  content: " *";
+}
+
+@import "../../vendor/twbs/bootstrap/scss/functions";
+@import "../../vendor/twbs/bootstrap/scss/variables";
+@import "../../vendor/twbs/bootstrap/scss/maps";
+@import "../../vendor/twbs/bootstrap/scss/mixins";
+@import "../../vendor/twbs/bootstrap/scss/root";
+
+@import "../../vendor/twbs/bootstrap/scss/utilities";
+@import "../../vendor/twbs/bootstrap/scss/reboot";
+@import "../../vendor/twbs/bootstrap/scss/type";
+@import "../../vendor/twbs/bootstrap/scss/images";
+@import "../../vendor/twbs/bootstrap/scss/containers";
+@import "../../vendor/twbs/bootstrap/scss/grid";
+@import "../../vendor/twbs/bootstrap/scss/helpers";
+
+@import "../../vendor/twbs/bootstrap/scss/tables";
+@import "../../vendor/twbs/bootstrap/scss/forms";
+@import "../../vendor/twbs/bootstrap/scss/buttons";
+@import "../../vendor/twbs/bootstrap/scss/transitions";
+@import "../../vendor/twbs/bootstrap/scss/dropdown";
+@import "../../vendor/twbs/bootstrap/scss/button-group";
+@import "../../vendor/twbs/bootstrap/scss/nav";
+@import "../../vendor/twbs/bootstrap/scss/navbar";
+@import "../../vendor/twbs/bootstrap/scss/card";
+@import "../../vendor/twbs/bootstrap/scss/breadcrumb";
+@import "../../vendor/twbs/bootstrap/scss/pagination";
+@import "../../vendor/twbs/bootstrap/scss/badge";
+@import "../../vendor/twbs/bootstrap/scss/alert";
+@import "../../vendor/twbs/bootstrap/scss/progress";
+@import "../../vendor/twbs/bootstrap/scss/list-group";
+@import "../../vendor/twbs/bootstrap/scss/close";
+@import "../../vendor/twbs/bootstrap/scss/modal";
+@import "../../vendor/twbs/bootstrap/scss/tooltip";
+@import "../../vendor/twbs/bootstrap/scss/popover";
+@import "../../vendor/twbs/bootstrap/scss/utilities/api";
+@import "../../vendor/twbs/bootstrap/scss/accordion";
+
+// Variables pour le thème sombre dans media query (prefers-color-scheme: dark)
+@media (prefers-color-scheme: dark) {
+  $body-bg: #111827 !default;
+  $body-color: #f8fafc !default;
+
+  $primary: #1d4ed8 !default;
+  $primary-hover: #1e40af !default;
+
+  $success: #15803d !default;
+  $success-hover: #166534 !default;
+
+  $gray-100: #1e293b !default;
+  $gray-200: #334155 !default;
+  $gray-300: #475569 !default;
+  $gray-400: #64748b !default;
+  $gray-500: #94a3b8 !default;
+  $gray-600: #cbd5e1 !default;
+  $gray-700: #e2e8f0 !default;
+  $gray-800: #f1f5f9 !default;
+  $gray-900: #f8fafc !default;
+
+  $red-50: #7f1d1d !default;
+  $red-300: #fecaca !default;
+  $red-400: #fecaca !default;
+  $red-600: #f87171 !default;
+  $red-700: #fca5a5 !default;
+  $red-800: #991b1b !default;
+
+  $amber-400: #fde68a !default;
+  $amber-600: #fbbf24 !default;
+
+  $border-color: #334155 !default;
+
+  $tooltip-color: #f8fafc !default;
+  $tooltip-bg: $primary !default;
+}

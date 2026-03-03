@@ -46,7 +46,10 @@
         "symfony/validator": "7.3.*",
         "symfony/web-link": "7.3.*",
         "symfony/yaml": "7.3.*",
-        "twig/extra-bundle": "^2.12|^3.0",
+        "symfonycasts/sass-bundle": "^0.9.0",
+        "twbs/bootstrap": "^5.3",
+        "twig/extra-bundle": "^3.23",
+        "twig/markdown-extra": "^3.23",
         "twig/twig": "^2.12|^3.0"
     },
     "config": {
