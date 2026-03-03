@@ -52,6 +52,7 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/admin/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/register$, roles: PUBLIC_ACCESS }
         - { path: ^/api/login$, roles: PUBLIC_ACCESS }
         - { path: ^/api($|/docs|/docs\.jsonopenapi), roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: ROLE_CUSTOMER }

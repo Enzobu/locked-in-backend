@@ -32,6 +32,26 @@
       "value": "customer1234"
     },
     {
+      "key": "registerEmail",
+      "value": "new.customer@example.com"
+    },
+    {
+      "key": "registerPassword",
+      "value": "customer1234"
+    },
+    {
+      "key": "registerFirstname",
+      "value": "Nina"
+    },
+    {
+      "key": "registerLastname",
+      "value": "Roux"
+    },
+    {
+      "key": "registerBirthDate",
+      "value": "1997-05-12"
+    },
+    {
       "key": "addressId",
       "value": "1"
     },
@@ -75,6 +95,46 @@
     {
       "name": "Authentication",
       "item": [
+        {
+          "name": "Customer register",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{registerEmail}}\",\n  \"password\": \"{{registerPassword}}\",\n  \"firstname\": \"{{registerFirstname}}\",\n  \"lastname\": \"{{registerLastname}}\",\n  \"birthDate\": \"{{registerBirthDate}}\",\n  \"address\": \"{{apiPrefix}}/addresses/{{addressId}}\"\n}"
+            },
+            "url": "{{baseUrl}}{{apiPrefix}}/register"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Registration success', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  var data = pm.response.json();",
+                  "  pm.expect(data).to.have.property('token');",
+                  "});",
+                  "",
+                  "var json = pm.response.json();",
+                  "if (json && json.token) {",
+                  "  pm.environment.set('bearerToken', json.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
         {
           "name": "Customer login (JWT)",
           "request": {
