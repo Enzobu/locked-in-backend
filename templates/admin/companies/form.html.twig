@@ -1,0 +1,46 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block admin_content %}
+    <section class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-4">
+        <div>
+            <h2 class="h3 mb-1">{{ title }}</h2>
+            <p class="text-body-secondary mb-0">Renseignez les informations de la societe.</p>
+        </div>
+        <a href="{{ path('app_admin_companies_index') }}" class="btn btn-outline-secondary">Retour</a>
+    </section>
+
+    <article class="card shadow-sm">
+        <div class="card-body">
+            {{ form_start(form) }}
+            <div class="row g-3">
+                <div class="col-12 col-md-6">{{ form_row(form.name) }}</div>
+                <div class="col-12 col-md-6">{{ form_row(form.phone) }}</div>
+                <div class="col-12 col-md-4">{{ form_row(form.siret) }}</div>
+                <div class="col-12 col-md-4">{{ form_row(form.siren) }}</div>
+                <div class="col-12 col-md-4">{{ form_row(form.ape) }}</div>
+                <div class="col-12 col-md-6">{{ form_row(form.juridicForm) }}</div>
+
+                <div class="col-12">
+                    <div class="border rounded p-3">
+                        <h3 class="h6 mb-3">Adresse</h3>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-4">{{ form_row(form.address.number) }}</div>
+                            <div class="col-12 col-md-8">{{ form_row(form.address.street) }}</div>
+                            <div class="col-12 col-md-6">{{ form_row(form.address.city) }}</div>
+                            <div class="col-12 col-md-6">{{ form_row(form.address.country) }}</div>
+                            <div class="col-12">{{ form_row(form.address.complement) }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button class="btn btn-primary" type="submit">{{ submitLabel }}</button>
+                <a href="{{ path('app_admin_companies_index') }}" class="btn btn-outline-secondary">Annuler</a>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </article>
+{% endblock %}

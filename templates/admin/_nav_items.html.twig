@@ -8,6 +8,22 @@
 </a>
 
 <a
+    href="{{ path('app_admin_locker_bays_index') }}"
+    class="nav-link sidebar-btn d-flex align-items-center gap-2 rounded-3 px-3 py-2 {{ currentRoute starts with 'app_admin_locker_bays' or currentRoute starts with 'app_admin_lockers' ? 'sidebar-btn-active fw-semibold text-primary-emphasis' : 'text-body' }}"
+>
+    <span>Casiers</span>
+</a>
+
+{% if is_granted('ROLE_ADMIN') %}
+    <a
+        href="{{ path('app_admin_companies_index') }}"
+        class="nav-link sidebar-btn d-flex align-items-center gap-2 rounded-3 px-3 py-2 {{ currentRoute starts with 'app_admin_companies' ? 'sidebar-btn-active fw-semibold text-primary-emphasis' : 'text-body' }}"
+    >
+        <span>Societes</span>
+    </a>
+{% endif %}
+
+<a
     href="{{ path('app_admin_users_index') }}"
     class="nav-link sidebar-btn d-flex align-items-center gap-2 rounded-3 px-3 py-2 {{ currentRoute starts with 'app_admin_users' ? 'sidebar-btn-active fw-semibold text-primary-emphasis' : 'text-body' }}"
 >

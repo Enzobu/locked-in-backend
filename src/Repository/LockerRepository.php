@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Locker;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +17,21 @@ class LockerRepository extends ServiceEntityRepository
         parent::__construct($registry, Locker::class);
     }
 
-//    /**
-//     * @return Locker[] Returns an array of Locker objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('l.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findOneVisibleForBackoffice(int $id, User $user): ?Locker
+    {
+        $qb = $this->createQueryBuilder('l')
+            ->leftJoin('l.lockerBay', 'b')->addSelect('b')
+            ->leftJoin('b.company', 'c')->addSelect('c')
+            ->leftJoin('l.specification', 's')->addSelect('s')
+            ->andWhere('l.id = :id')
+            ->setParameter('id', $id);
 
-//    public function findOneBySomeField($value): ?Locker
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        if (!in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            $qb
+                ->andWhere('b.company = :company')
+                ->setParameter('company', $user->getCompany());
+        }
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
 }

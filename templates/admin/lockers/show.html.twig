@@ -1,0 +1,160 @@
+{% extends 'admin/layout.html.twig' %}
+{% import 'macros/badge.html.twig' as label %}
+
+{% block title %}Casier #{{ locker.number }}{% endblock %}
+
+{% block admin_content %}
+    <section class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-4">
+        <div>
+            <a class="link-secondary text-decoration-none" href="{{ path('app_admin_locker_bays_show', {id: locker.lockerBay.id}) }}">← Retour a la baie {{ locker.lockerBay.name }}</a>
+            <h2 class="h3 mt-2 mb-1">Casier #{{ locker.number }}</h2>
+            <p class="text-body-secondary mb-0">{{ locker.lockerBay.name }} - {{ locker.lockerBay.company.name }}</p>
+        </div>
+        {% if is_granted('ROLE_ADMIN') %}
+            <div class="d-flex gap-2">
+                <a class="btn btn-outline-primary" href="{{ path('app_admin_companies_lockers_edit', {id: locker.id}) }}">Modifier casier</a>
+                <form method="post" action="{{ path('app_admin_companies_lockers_delete', {id: locker.id}) }}" onsubmit="return confirm('Supprimer ce casier ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete_locker_' ~ locker.id) }}">
+                    <button class="btn btn-outline-danger" type="submit">Supprimer casier</button>
+                </form>
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="row g-3 mb-4">
+        <div class="col-12 col-xl-4">
+            <article class="card shadow-sm h-100">
+                <div class="card-header bg-transparent"><h3 class="h6 mb-0">Informations casier</h3></div>
+                <div class="card-body small">
+                    <p class="mb-2"><strong>Statut:</strong>
+                        {% if locker.status.value == 'available' %}
+                            {{ label.default('Disponible', 'success') }}
+                        {% elseif locker.status.value == 'reserved' %}
+                            {{ label.default('Reserve') }}
+                        {% elseif locker.status.value == 'occupied' %}
+                            {{ label.default('Occupe', 'warning') }}
+                        {% elseif locker.status.value == 'offline' %}
+                            {{ label.default('Offline', 'danger') }}
+                        {% else %}
+                            {{ label.default('Hors service', 'dark') }}
+                        {% endif %}
+                    </p>
+                    <p class="mb-2"><strong>Hardware ID:</strong> {{ locker.hardwareId ?? '-' }}</p>
+                    <p class="mb-2"><strong>Prix:</strong> {{ (locker.priceCents / 100)|number_format(2, ',', ' ') }} EUR</p>
+                    <p class="mb-2"><strong>Derniere vue:</strong> {{ locker.lastSeenAt ? locker.lastSeenAt|date('d/m/Y H:i') : '-' }}</p>
+                    <p class="mb-0"><strong>Derniere maj:</strong> {{ locker.updatedAt|date('d/m/Y H:i') }}</p>
+                </div>
+            </article>
+        </div>
+        <div class="col-12 col-xl-8">
+            <article class="card shadow-sm h-100">
+                <div class="card-header bg-transparent"><h3 class="h6 mb-0">Mini dashboard</h3></div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-6 col-lg-4">{{ label.emphasis(upcomingReservations|length ~ ' a venir', 'primary') }}</div>
+                        <div class="col-6 col-lg-4">{{ label.emphasis(currentReservations|length ~ ' en cours', 'success') }}</div>
+                        <div class="col-6 col-lg-4">{{ label.emphasis(historyReservations|length ~ ' historiques', 'secondary') }}</div>
+                        <div class="col-6 col-lg-4">{{ label.emphasis(recentActions|length ~ ' actions', 'warning') }}</div>
+                        <div class="col-6 col-lg-4">{{ label.emphasis(recentEvents|length ~ ' evenements', 'info') }}</div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="row g-3 mb-4">
+        <div class="col-12">
+            <article class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h3 class="h6 mb-0">Reservations a venir</h3>
+                    {{ label.default(upcomingReservations|length, 'primary') }}
+                </div>
+                <div class="card-body p-0">
+                    {% if upcomingReservations is empty %}
+                        <p class="p-3 text-body-secondary mb-0">Aucune reservation a venir.</p>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead><tr><th>Debut</th><th>Fin</th><th>Client</th><th>Statut</th></tr></thead>
+                                <tbody>
+                                    {% for reservation in upcomingReservations %}
+                                        <tr>
+                                            <td>{{ reservation.startsAt|date('d/m/Y H:i') }}</td>
+                                            <td>{{ reservation.endsAt|date('d/m/Y H:i') }}</td>
+                                            <td>{{ reservation.customer.firstname }} {{ reservation.customer.lastname }}</td>
+                                            <td>{{ label.default(reservation.status.value, 'secondary') }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="row g-3 mb-4">
+        <div class="col-12">
+            <article class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h3 class="h6 mb-0">Reservation(s) en cours</h3>
+                    {{ label.default(currentReservations|length, 'success') }}
+                </div>
+                <div class="card-body p-0">
+                    {% if currentReservations is empty %}
+                        <p class="p-3 text-body-secondary mb-0">Aucune reservation en cours.</p>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead><tr><th>Debut</th><th>Fin</th><th>Client</th><th>Statut</th></tr></thead>
+                                <tbody>
+                                    {% for reservation in currentReservations %}
+                                        <tr>
+                                            <td>{{ reservation.startsAt|date('d/m/Y H:i') }}</td>
+                                            <td>{{ reservation.endsAt|date('d/m/Y H:i') }}</td>
+                                            <td>{{ reservation.customer.firstname }} {{ reservation.customer.lastname }}</td>
+                                            <td>{{ label.default(reservation.status.value, 'success') }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="row g-3">
+        <div class="col-12">
+            <article class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h3 class="h6 mb-0">Historique des reservations</h3>
+                    {{ label.default(historyReservations|length, 'secondary') }}
+                </div>
+                <div class="card-body p-0">
+                    {% if historyReservations is empty %}
+                        <p class="p-3 text-body-secondary mb-0">Aucun historique de reservation.</p>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead><tr><th>Debut</th><th>Fin</th><th>Client</th><th>Statut</th></tr></thead>
+                                <tbody>
+                                    {% for reservation in historyReservations %}
+                                        <tr>
+                                            <td>{{ reservation.startsAt|date('d/m/Y H:i') }}</td>
+                                            <td>{{ reservation.endsAt|date('d/m/Y H:i') }}</td>
+                                            <td>{{ reservation.customer.firstname }} {{ reservation.customer.lastname }}</td>
+                                            <td>{{ label.default(reservation.status.value, 'secondary') }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </article>
+        </div>
+    </section>
+{% endblock %}

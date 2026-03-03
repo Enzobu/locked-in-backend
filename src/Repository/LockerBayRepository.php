@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\LockerBay;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +17,46 @@ class LockerBayRepository extends ServiceEntityRepository
         parent::__construct($registry, LockerBay::class);
     }
 
-    //    /**
-    //     * @return LockerBay[] Returns an array of LockerBay objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('l')
-    //            ->andWhere('l.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('l.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return LockerBay[]
+     */
+    public function findVisibleForBackoffice(User $user, ?string $search = null): array
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->leftJoin('b.company', 'c')->addSelect('c')
+            ->leftJoin('b.lockers', 'l')->addSelect('l')
+            ->orderBy('b.name', 'ASC');
 
-    //    public function findOneBySomeField($value): ?LockerBay
-    //    {
-    //        return $this->createQueryBuilder('l')
-    //            ->andWhere('l.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if (!in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            $qb
+                ->andWhere('b.company = :company')
+                ->setParameter('company', $user->getCompany());
+        }
+
+        if ($search !== null && trim($search) !== '') {
+            $qb
+                ->andWhere('LOWER(b.name) LIKE :q OR LOWER(c.name) LIKE :q')
+                ->setParameter('q', '%'.mb_strtolower(trim($search)).'%');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findOneVisibleForBackoffice(int $id, User $user): ?LockerBay
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->leftJoin('b.company', 'c')->addSelect('c')
+            ->leftJoin('b.lockers', 'l')->addSelect('l')
+            ->leftJoin('l.specification', 's')->addSelect('s')
+            ->andWhere('b.id = :id')
+            ->setParameter('id', $id);
+
+        if (!in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            $qb
+                ->andWhere('b.company = :company')
+                ->setParameter('company', $user->getCompany());
+        }
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
 }

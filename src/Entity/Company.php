@@ -38,7 +38,7 @@ class Company
     #[ORM\Column(length: 255)]
     private ?string $ape = null;
 
-    #[ORM\ManyToOne(inversedBy: 'companies')]
+    #[ORM\ManyToOne(inversedBy: 'companies', cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['locker_bay:read'])]
     private ?Address $address = null;
