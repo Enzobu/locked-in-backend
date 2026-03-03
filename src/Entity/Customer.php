@@ -67,9 +67,11 @@ class Customer implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?\DateTimeImmutable $birthDate = null;
 
-    #[ORM\ManyToOne(inversedBy: 'customers')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Address $address = null;
+    /**
+     * @var Collection<int, Address>
+     */
+    #[ORM\OneToMany(targetEntity: Address::class, mappedBy: 'customer', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $addresses;
 
     /**
      * @var Collection<int, Reservation>
@@ -83,9 +85,16 @@ class Customer implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isDeleted = false;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $deletedAt = null;
+
     public function __construct()
     {
         $this->reservations = new ArrayCollection();
+        $this->addresses = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
     }
@@ -182,14 +191,47 @@ class Customer implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getAddress(): ?Address
+    /**
+     * @return Collection<int, Address>
+     */
+    public function getAddresses(): Collection
     {
-        return $this->address;
+        return $this->addresses;
+    }
+
+    public function addAddress(Address $address): static
+    {
+        if (!$this->addresses->contains($address)) {
+            $this->addresses->add($address);
+            $address->setCustomer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAddress(Address $address): static
+    {
+        if ($this->addresses->removeElement($address)) {
+            if ($address->getCustomer() === $this) {
+                $address->setCustomer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getPrimaryAddress(): ?Address
+    {
+        return $this->addresses->first() ?: null;
     }
 
     public function setAddress(?Address $address): static
     {
-        $this->address = $address;
+        $this->addresses->clear();
+
+        if ($address !== null) {
+            $this->addAddress($address);
+        }
 
         return $this;
     }
@@ -239,6 +281,54 @@ class Customer implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->isDeleted;
+    }
+
+    public function setIsDeleted(bool $isDeleted): static
+    {
+        $this->isDeleted = $isDeleted;
+
+        if ($isDeleted && $this->deletedAt === null) {
+            $this->deletedAt = new \DateTimeImmutable();
+        }
+
+        if (!$isDeleted) {
+            $this->deletedAt = null;
+        }
+
+        return $this;
+    }
+
+    public function getDeletedAt(): ?\DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?\DateTimeImmutable $deletedAt): static
+    {
+        $this->deletedAt = $deletedAt;
+
+        return $this;
+    }
+
+    public function softDelete(): static
+    {
+        $this->isDeleted = true;
+        $this->deletedAt = new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function restore(): static
+    {
+        $this->isDeleted = false;
+        $this->deletedAt = null;
 
         return $this;
     }

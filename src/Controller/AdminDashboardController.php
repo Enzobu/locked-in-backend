@@ -68,7 +68,7 @@ class AdminDashboardController extends AbstractController
             'outOfOrderLockers' => $outOfOrderLockers,
             'occupancyRate' => $totalLockers > 0 ? (int) round((($occupiedLockers + $reservedLockers) / $totalLockers) * 100) : 0,
             'totalLockerBays' => $lockerBayRepository->count([]),
-            'totalCustomers' => $customerRepository->count([]),
+            'totalCustomers' => $customerRepository->count(['isDeleted' => false]),
             'totalReservations' => $totalReservations,
             'activeReservations' => $activeReservations,
             'confirmedReservations' => $confirmedReservations,

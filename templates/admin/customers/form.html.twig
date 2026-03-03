@@ -1,0 +1,56 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block admin_content %}
+    <section class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-4">
+        <div>
+            <h2 class="h3 mb-1">{{ title }}</h2>
+            <p class="text-body-secondary mb-0">Renseignez les informations du client.</p>
+        </div>
+        <a href="{{ path('app_admin_customers_index') }}" class="btn btn-outline-secondary">Retour</a>
+    </section>
+
+    <article class="card shadow-sm">
+        <div class="card-body">
+            {{ form_start(form) }}
+            <div class="row g-3">
+                <div class="col-12 col-md-6">{{ form_row(form.firstname) }}</div>
+                <div class="col-12 col-md-6">{{ form_row(form.lastname) }}</div>
+                <div class="col-12 col-md-6">{{ form_row(form.email) }}</div>
+                <div class="col-12 col-md-6">{{ form_row(form.birthDate) }}</div>
+                <div class="col-12">
+                    <div
+                        class="p-3"
+                        data-controller="form-collection"
+                        data-form-collection-index-value="{{ form.addresses|length }}"
+                        data-form-collection-prototype-value="{{ include('admin/customers/_address_item.html.twig', {addressForm: form.addresses.vars.prototype})|e('html_attr') }}"
+                    >
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3 class="h6 mb-0">Adresses</h3>
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-action="click->form-collection#addCollectionElement">Ajouter une adresse</button>
+                        </div>
+
+                        {{ form_errors(form.addresses) }}
+
+                        <div
+                            class="mb-0"
+                            data-form-collection-target="collectionContainer"
+                        >
+                            {% for addressForm in form.addresses %}
+                                <div class="mb-3" data-form-collection-item="true">{{ include('admin/customers/_address_item.html.twig', {addressForm: addressForm}) }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">{{ form_row(form.plainPassword) }}</div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button class="btn btn-primary" type="submit">{{ submitLabel }}</button>
+                <a href="{{ path('app_admin_customers_index') }}" class="btn btn-outline-secondary">Annuler</a>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </article>
+{% endblock %}

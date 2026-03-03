@@ -23,6 +23,7 @@ security:
             pattern: ^/api/login$
             stateless: true
             provider: app_customer_provider
+            user_checker: App\Security\ActiveUserChecker
             json_login:
                 check_path: /api/login
                 username_path: email
@@ -34,11 +35,13 @@ security:
             pattern: ^/api
             stateless: true
             provider: app_customer_provider
+            user_checker: App\Security\ActiveUserChecker
             jwt: ~
 
         main:
             lazy: true
             provider: app_user_provider
+            user_checker: App\Security\ActiveUserChecker
             form_login:
                 login_path: app_admin_login
                 check_path: app_admin_login

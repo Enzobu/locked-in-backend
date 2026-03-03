@@ -167,8 +167,8 @@ class AppFixtures extends Fixture
             ->setFirstname('Lea')
             ->setLastname('Dupont')
             ->setBirthDate(new \DateTimeImmutable('1995-03-14'))
-            ->setAddress($secondaryAddress)
             ->setRoles(['ROLE_CUSTOMER']);
+        $customerA->addAddress($secondaryAddress);
         $customerA->setPassword($this->passwordHasher->hashPassword($customerA, 'customer1234'));
 
         $customerB = (new Customer())
@@ -176,8 +176,8 @@ class AppFixtures extends Fixture
             ->setFirstname('Yanis')
             ->setLastname('Bernard')
             ->setBirthDate(new \DateTimeImmutable('1991-08-28'))
-            ->setAddress($hqAddress)
             ->setRoles(['ROLE_CUSTOMER']);
+        $customerB->addAddress($hqAddress);
         $customerB->setPassword($this->passwordHasher->hashPassword($customerB, 'customer1234'));
 
         $manager->persist($customerA);

@@ -1,0 +1,79 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Utilisateurs backoffice{% endblock %}
+
+{% block admin_content %}
+    <section class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-4">
+        <div>
+            <h2 class="h3 mb-1">Utilisateurs backoffice</h2>
+            <p class="text-body-secondary mb-0">Gestion des comptes administrateurs de la plateforme.</p>
+        </div>
+        <a href="{{ path('app_admin_users_new') }}" class="btn btn-primary">Nouvel utilisateur</a>
+    </section>
+
+    <form class="row g-2 mb-3" method="get">
+        <div class="col-12 col-md-6 col-xl-4">
+            <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Rechercher email, nom, societe">
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-outline-primary" type="submit">Rechercher</button>
+        </div>
+        <div class="col-auto">
+            <a class="btn btn-outline-secondary" href="{{ path('app_admin_users_index', {'deleted': showDeleted ? 0 : 1}) }}">
+                {{ showDeleted ? 'Voir actifs' : 'Voir supprimes' }}
+            </a>
+        </div>
+    </form>
+
+    <article class="card shadow-sm">
+        <div class="card-body p-0">
+            {% if users is empty %}
+                <p class="p-3 text-body-secondary mb-0">Aucun utilisateur trouve.</p>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Societe</th>
+                                <th>Roles</th>
+                                <th>Cree le</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                                <tr>
+                                    <td>{{ user.firstname }} {{ user.lastname }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.company.name }}</td>
+                                    <td>
+                                        {% for role in user.roles %}
+                                            <span class="badge text-bg-secondary me-1">{{ role }}</span>
+                                        {% endfor %}
+                                    </td>
+                                    <td>{{ user.createdAt|date('d/m/Y H:i') }}</td>
+                                    <td class="text-end">
+                                        {% if showDeleted %}
+                                            <form method="post" action="{{ path('app_admin_users_restore', {'id': user.id}) }}" class="d-inline">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('restore_user_' ~ user.id) }}">
+                                                <button class="btn btn-sm btn-outline-success" type="submit">Restaurer</button>
+                                            </form>
+                                        {% else %}
+                                            <a class="btn btn-sm btn-outline-primary" href="{{ path('app_admin_users_edit', {'id': user.id}) }}">Modifier</a>
+                                            <form method="post" action="{{ path('app_admin_users_delete', {'id': user.id}) }}" class="d-inline" onsubmit="return confirm('Desactiver cet utilisateur ?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete_user_' ~ user.id) }}">
+                                                <button class="btn btn-sm btn-outline-danger" type="submit">Desactiver</button>
+                                            </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </article>
+{% endblock %}

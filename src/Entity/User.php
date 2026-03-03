@@ -48,6 +48,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isDeleted = false;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $deletedAt = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -179,6 +185,54 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->isDeleted;
+    }
+
+    public function setIsDeleted(bool $isDeleted): static
+    {
+        $this->isDeleted = $isDeleted;
+
+        if ($isDeleted && $this->deletedAt === null) {
+            $this->deletedAt = new \DateTimeImmutable();
+        }
+
+        if (!$isDeleted) {
+            $this->deletedAt = null;
+        }
+
+        return $this;
+    }
+
+    public function getDeletedAt(): ?\DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?\DateTimeImmutable $deletedAt): static
+    {
+        $this->deletedAt = $deletedAt;
+
+        return $this;
+    }
+
+    public function softDelete(): static
+    {
+        $this->isDeleted = true;
+        $this->deletedAt = new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function restore(): static
+    {
+        $this->isDeleted = false;
+        $this->deletedAt = null;
+
+        return $this;
     }
 
     #[ORM\PrePersist]
