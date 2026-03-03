@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\AddressRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AddressRepository::class)]
+#[ApiResource]
 class Address
 {
     #[ORM\Id]
@@ -15,8 +17,8 @@ class Address
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $number = null;
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $number = null;
 
     #[ORM\Column(length: 255)]
     private ?string $city = null;
@@ -25,13 +27,10 @@ class Address
     private ?string $country = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $address = null;
+    private ?string $street = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $complement = null;
-
-    #[ORM\OneToOne(mappedBy: 'address', cascade: ['persist', 'remove'])]
-    private ?Company $company = null;
 
     /**
      * @var Collection<int, Customer>
@@ -39,9 +38,16 @@ class Address
     #[ORM\OneToMany(targetEntity: Customer::class, mappedBy: 'address')]
     private Collection $customers;
 
+    /**
+     * @var Collection<int, Company>
+     */
+    #[ORM\OneToMany(targetEntity: Company::class, mappedBy: 'address')]
+    private Collection $companies;
+
     public function __construct()
     {
         $this->customers = new ArrayCollection();
+        $this->companies = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -49,12 +55,12 @@ class Address
         return $this->id;
     }
 
-    public function getNumber(): ?int
+    public function getNumber(): ?string
     {
         return $this->number;
     }
 
-    public function setNumber(?int $number): static
+    public function setNumber(?string $number): static
     {
         $this->number = $number;
 
@@ -85,14 +91,26 @@ class Address
         return $this;
     }
 
+    public function getStreet(): ?string
+    {
+        return $this->street;
+    }
+
+    public function setStreet(string $street): static
+    {
+        $this->street = $street;
+
+        return $this;
+    }
+
     public function getAddress(): ?string
     {
-        return $this->address;
+        return $this->street;
     }
 
     public function setAddress(string $address): static
     {
-        $this->address = $address;
+        $this->street = $address;
 
         return $this;
     }
@@ -109,19 +127,28 @@ class Address
         return $this;
     }
 
-    public function getCompany(): ?Company
+    public function getCompanies(): Collection
     {
-        return $this->company;
+        return $this->companies;
     }
 
-    public function setCompany(Company $company): static
+    public function addCompany(Company $company): static
     {
-        // set the owning side of the relation if necessary
-        if ($company->getAddress() !== $this) {
+        if (!$this->companies->contains($company)) {
+            $this->companies->add($company);
             $company->setAddress($this);
         }
 
-        $this->company = $company;
+        return $this;
+    }
+
+    public function removeCompany(Company $company): static
+    {
+        if ($this->companies->removeElement($company)) {
+            if ($company->getAddress() === $this) {
+                $company->setAddress(null);
+            }
+        }
 
         return $this;
     }

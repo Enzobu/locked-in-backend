@@ -1,0 +1,244 @@
+{
+  "info": {
+    "name": "Locked-in Backend API",
+    "description": "Collection Postman variablee pour tester l'API Symfony/API Platform.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "{{baseUrl}}"
+    },
+    {
+      "key": "apiPrefix",
+      "value": "{{apiPrefix}}"
+    },
+    {
+      "key": "addressId",
+      "value": "1"
+    },
+    {
+      "key": "companyId",
+      "value": "1"
+    },
+    {
+      "key": "specificationId",
+      "value": "1"
+    },
+    {
+      "key": "lockerBayId",
+      "value": "1"
+    },
+    {
+      "key": "lockerId",
+      "value": "1"
+    },
+    {
+      "key": "customerId",
+      "value": "1"
+    },
+    {
+      "key": "reservationId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "API Docs",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}{{apiPrefix}}"
+      }
+    },
+    {
+      "name": "Addresses",
+      "item": [
+        {
+          "name": "List addresses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{apiPrefix}}/addresses"
+          }
+        },
+        {
+          "name": "Create address",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"number\": \"18B\",\n  \"city\": \"Lyon\",\n  \"country\": \"France\",\n  \"street\": \"Rue de la Republique\",\n  \"complement\": \"Batiment C\"\n}"
+            },
+            "url": "{{baseUrl}}{{apiPrefix}}/addresses"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Core",
+      "item": [
+        {
+          "name": "Create company",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Open Innov 2\",\n  \"siret\": \"22345678901234\",\n  \"siren\": \"223456789\",\n  \"ape\": \"6201Z\",\n  \"address\": \"{{apiPrefix}}/addresses/{{addressId}}\",\n  \"juridicForm\": \"SAS\",\n  \"phone\": \"+33478000000\"\n}"
+            },
+            "url": "{{baseUrl}}{{apiPrefix}}/companies"
+          }
+        },
+        {
+          "name": "Create specification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"width\": 35,\n  \"height\": 25,\n  \"depth\": 45,\n  \"material\": \"Steel\",\n  \"name\": \"S+\",\n  \"isRechargeable\": true\n}"
+            },
+            "url": "{{baseUrl}}{{apiPrefix}}/specifications"
+          }
+        },
+        {
+          "name": "Create locker bay",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Lyon Bellecour\",\n  \"latitude\": \"45.7578137\",\n  \"longitude\": \"4.8320114\",\n  \"company\": \"{{apiPrefix}}/companies/{{companyId}}\",\n  \"maxDuration\": 1440,\n  \"minDuration\": 30\n}"
+            },
+            "url": "{{baseUrl}}{{apiPrefix}}/locker_bays"
+          }
+        },
+        {
+          "name": "Create locker",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"number\": 10,\n  \"hardwareId\": \"LOCK-LYON-BEL-010\",\n  \"specification\": \"{{apiPrefix}}/specifications/{{specificationId}}\",\n  \"priceCents\": 400,\n  \"lockerBay\": \"{{apiPrefix}}/locker_bays/{{lockerBayId}}\",\n  \"status\": \"available\",\n  \"lastSeenAt\": \"2026-03-03T10:00:00+00:00\"\n}"
+            },
+            "url": "{{baseUrl}}{{apiPrefix}}/lockers"
+          }
+        },
+        {
+          "name": "Create customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"sam.dupuis@example.com\",\n  \"roles\": [\n    \"ROLE_CUSTOMER\"\n  ],\n  \"password\": \"customer1234\",\n  \"firstname\": \"Sam\",\n  \"lastname\": \"Dupuis\",\n  \"birthDate\": \"1998-06-15T00:00:00+00:00\",\n  \"address\": \"{{apiPrefix}}/addresses/{{addressId}}\"\n}"
+            },
+            "url": "{{baseUrl}}{{apiPrefix}}/customers"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reservation Flow",
+      "item": [
+        {
+          "name": "Create reservation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startsAt\": \"2026-03-04T09:00:00+00:00\",\n  \"endsAt\": \"2026-03-04T11:00:00+00:00\",\n  \"customer\": \"{{apiPrefix}}/customers/{{customerId}}\",\n  \"locker\": \"{{apiPrefix}}/lockers/{{lockerId}}\",\n  \"status\": \"confirmed\"\n}"
+            },
+            "url": "{{baseUrl}}{{apiPrefix}}/reservations"
+          }
+        },
+        {
+          "name": "Create locker action",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"locker\": \"{{apiPrefix}}/lockers/{{lockerId}}\",\n  \"type\": \"open\",\n  \"status\": \"pending\",\n  \"reservation\": \"{{apiPrefix}}/reservations/{{reservationId}}\",\n  \"requestedByCustomer\": \"{{apiPrefix}}/customers/{{customerId}}\",\n  \"requestedAt\": \"2026-03-03T10:30:00+00:00\"\n}"
+            },
+            "url": "{{baseUrl}}{{apiPrefix}}/locker_actions"
+          }
+        },
+        {
+          "name": "Create locker event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"locker\": \"{{apiPrefix}}/lockers/{{lockerId}}\",\n  \"reservation\": \"{{apiPrefix}}/reservations/{{reservationId}}\",\n  \"type\": \"door_opened\",\n  \"payload\": {\n    \"source\": \"mobile_app\",\n    \"battery\": 91\n  },\n  \"occurredAt\": \"2026-03-03T10:31:00+00:00\"\n}"
+            },
+            "url": "{{baseUrl}}{{apiPrefix}}/locker_events"
+          }
+        }
+      ]
+    }
+  ]
+}
