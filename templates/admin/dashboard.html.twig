@@ -1,14 +1,206 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/layout.html.twig' %}
+{% import 'macros/badge.html.twig' as label %}
 
 {% block title %}Dashboard Backoffice{% endblock %}
 
-{% block body %}
-    <main style="max-width: 860px; margin: 3rem auto; font-family: sans-serif;">
-        <h1>Dashboard Backoffice</h1>
-        <p>Connecte en tant que {{ app.user.userIdentifier }}.</p>
+{% block admin_content %}
+    <section class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-4">
+        <div>
+            <h2 class="h3 mb-1">Tableau de bord</h2>
+            <p class="text-body-secondary mb-0">Vue d'ensemble du parc de casiers et des activites en cours.</p>
+        </div>
+        <a href="/api" class="btn btn-outline-primary" target="_blank" rel="noreferrer">Ouvrir API Docs</a>
+    </section>
 
-        <p>
-            <a href="{{ path('app_admin_logout') }}">Se deconnecter</a>
-        </p>
-    </main>
+    <section class="row g-3 mb-4">
+        <div class="col-12 col-md-6 col-xl-3">
+            <article class="card shadow-sm h-100 dashboard-kpi">
+                <div class="card-body">
+                    <p class="text-body-secondary mb-1">Casiers total</p>
+                    <p class="display-6 fw-semibold mb-2">{{ totalLockers }}</p>
+                    <p class="small mb-0">{{ availableLockers }} disponibles, {{ occupiedLockers }} occupes</p>
+                </div>
+            </article>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+            <article class="card shadow-sm h-100 dashboard-kpi">
+                <div class="card-body">
+                    <p class="text-body-secondary mb-1">Occupation</p>
+                    <p class="display-6 fw-semibold mb-2">{{ occupancyRate }}%</p>
+                    <p class="small mb-0">{{ reservedLockers }} reserves en attente</p>
+                </div>
+            </article>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+            <article class="card shadow-sm h-100 dashboard-kpi">
+                <div class="card-body">
+                    <p class="text-body-secondary mb-1">Reservations</p>
+                    <p class="display-6 fw-semibold mb-2">{{ totalReservations }}</p>
+                    <p class="small mb-0">{{ activeReservations }} actives, {{ confirmedReservations }} confirmees</p>
+                </div>
+            </article>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+            <article class="card shadow-sm h-100 dashboard-kpi">
+                <div class="card-body">
+                    <p class="text-body-secondary mb-1">Parc</p>
+                    <p class="display-6 fw-semibold mb-2">{{ totalLockerBays }}</p>
+                    <p class="small mb-0">{{ totalCustomers }} clients inscrits</p>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="row g-3 mb-4">
+        <div class="col-12 col-xl-7">
+            <article class="card shadow-sm h-100">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h3 class="h6 mb-0">Reservations a venir</h3>
+                    {{ label.default(upcomingReservations|length) }}
+                </div>
+                <div class="card-body p-0">
+                    {% if upcomingReservations is empty %}
+                        <p class="text-body-secondary p-3 mb-0">Aucune reservation a venir.</p>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0 table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Debut</th>
+                                        <th>Client</th>
+                                        <th>Casier</th>
+                                        <th>Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for reservation in upcomingReservations %}
+                                        <tr>
+                                            <td>{{ reservation.startsAt|date('d/m/Y H:i') }}</td>
+                                            <td>{{ reservation.customer.firstname }} {{ reservation.customer.lastname }}</td>
+                                            <td>{{ reservation.locker.lockerBay.name }} - #{{ reservation.locker.number }}</td>
+                                            <td>
+                                                {% set status = reservation.status.value %}
+                                                {% if status == 'active' %}
+                                                    {{ label.default('active', 'success') }}
+                                                {% elseif status == 'confirmed' %}
+                                                    {{ label.default('confirmee') }}
+                                                {% elseif status == 'pending' %}
+                                                    {{ label.default('en attente', 'warning') }}
+                                                {% elseif status == 'completed' %}
+                                                    {{ label.default('terminee', 'secondary') }}
+                                                {% elseif status == 'cancelled' %}
+                                                    {{ label.default('annulee', 'danger') }}
+                                                {% elseif status == 'expired' %}
+                                                    {{ label.default('expiree', 'dark') }}
+                                                {% else %}
+                                                    {{ label.default(status, 'secondary') }}
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </article>
+        </div>
+
+        <div class="col-12 col-xl-5">
+            <article class="card shadow-sm h-100">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h3 class="h6 mb-0">Alertes casiers</h3>
+                    {{ label.default(lockerAlerts|length, 'danger') }}
+                </div>
+                <div class="card-body p-0">
+                    {% if lockerAlerts is empty %}
+                        <p class="text-body-secondary p-3 mb-0">Aucune alerte critique detectee.</p>
+                    {% else %}
+                        <ul class="list-group list-group-flush">
+                            {% for locker in lockerAlerts %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center gap-2">
+                                    <div>
+                                        <p class="mb-0 fw-semibold">{{ locker.lockerBay.name }} - casier #{{ locker.number }}</p>
+                                        <p class="text-body-secondary small mb-0">Maj: {{ locker.updatedAt|date('d/m H:i') }}</p>
+                                    </div>
+                                    {% if locker.status.value == 'offline' %}
+                                        {{ label.default('offline', 'danger') }}
+                                    {% else %}
+                                        {{ label.default('out_of_order', 'warning') }}
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="row g-3">
+        <div class="col-12 col-lg-6">
+            <article class="card shadow-sm h-100">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h3 class="h6 mb-0">Actions recentes</h3>
+                    {{ label.default(recentActions|length, 'secondary') }}
+                </div>
+                <div class="card-body p-0">
+                    {% if recentActions is empty %}
+                        <p class="text-body-secondary p-3 mb-0">Aucune action recente.</p>
+                    {% else %}
+                        <ul class="list-group list-group-flush">
+                            {% for action in recentActions %}
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <p class="mb-0 fw-semibold">{{ action.type }} - casier #{{ action.locker.number }}</p>
+                                        {% set actionStatus = action.status.value %}
+                                        {% if actionStatus == 'success' %}
+                                            {{ label.default('success', 'success') }}
+                                        {% elseif actionStatus == 'failed' %}
+                                            {{ label.default('failed', 'danger') }}
+                                        {% elseif actionStatus == 'sent' %}
+                                            {{ label.default('sent') }}
+                                        {% elseif actionStatus == 'pending' %}
+                                            {{ label.default('pending', 'warning') }}
+                                        {% else %}
+                                            {{ label.default(actionStatus, 'secondary') }}
+                                        {% endif %}
+                                    </div>
+                                    <p class="text-body-secondary small mb-0">{{ action.requestedAt|date('d/m/Y H:i') }}</p>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </article>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <article class="card shadow-sm h-100">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h3 class="h6 mb-0">Evenements recents</h3>
+                    {{ label.default(recentEvents|length, 'secondary') }}
+                </div>
+                <div class="card-body p-0">
+                    {% if recentEvents is empty %}
+                        <p class="text-body-secondary p-3 mb-0">Aucun evenement recent.</p>
+                    {% else %}
+                        <ul class="list-group list-group-flush">
+                            {% for event in recentEvents %}
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <p class="mb-0 fw-semibold">{{ event.type }} - casier #{{ event.locker.number }}</p>
+                                        {{ label.emphasis(event.occurredAt|date('H:i')) }}
+                                    </div>
+                                    {% if event.payload %}
+                                        <p class="text-body-secondary small mb-0">{{ event.payload|json_encode }}</p>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </article>
+        </div>
+    </section>
 {% endblock %}
