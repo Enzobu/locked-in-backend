@@ -50,10 +50,29 @@ class AppFixtures extends Fixture
         $faker = $fakerFactoryClass::create('fr_FR');
         $faker->seed(20260303);
 
-        $specificationIds = $this->createSpecifications($manager);
-        [$companyIds, $customerIds] = $this->createCompaniesUsersCustomers($manager, $faker);
+        $profile = $this->resolveFixturesProfile();
 
-        $this->createParksAndReservations($manager, $faker, $companyIds, $customerIds, $specificationIds);
+        $specificationIds = $this->createSpecifications($manager);
+        [$companyIds, $customerIds] = $this->createCompaniesUsersCustomers(
+            $manager,
+            $faker,
+            $profile['companyCount'],
+            $profile['customerCount'],
+        );
+
+        $this->createParksAndReservations(
+            $manager,
+            $faker,
+            $companyIds,
+            $customerIds,
+            $specificationIds,
+            $profile['minBayCount'],
+            $profile['maxBayCount'],
+            $profile['minLockerCount'],
+            $profile['maxLockerCount'],
+            $profile['minReservationCount'],
+            $profile['maxReservationCount'],
+        );
     }
 
     /**
@@ -91,12 +110,12 @@ class AppFixtures extends Fixture
     /**
      * @return array{0: int[], 1: int[]}
      */
-    private function createCompaniesUsersCustomers(ObjectManager $manager, object $faker): array
+    private function createCompaniesUsersCustomers(ObjectManager $manager, object $faker, int $companyCount, int $customerCount): array
     {
         $companies = [];
         $customers = [];
 
-        for ($i = 1; $i <= 20; ++$i) {
+        for ($i = 1; $i <= $companyCount; ++$i) {
             $city = self::CITIES[($i - 1) % count(self::CITIES)]['name'];
 
             $address = (new Address())
@@ -139,7 +158,7 @@ class AppFixtures extends Fixture
         $superAdmin->setPassword($this->passwordHasher->hashPassword($superAdmin, 'password'));
         $manager->persist($superAdmin);
 
-        for ($i = 1; $i <= 10; ++$i) {
+        for ($i = 1; $i <= $customerCount; ++$i) {
             $city = self::CITIES[array_rand(self::CITIES)]['name'];
 
             $customerAddress = (new Address())
@@ -177,7 +196,19 @@ class AppFixtures extends Fixture
      * @param int[] $customerIds
      * @param int[] $specificationIds
      */
-    private function createParksAndReservations(ObjectManager $manager, object $faker, array $companyIds, array $customerIds, array $specificationIds): void
+    private function createParksAndReservations(
+        ObjectManager $manager,
+        object $faker,
+        array $companyIds,
+        array $customerIds,
+        array $specificationIds,
+        int $minBayCount,
+        int $maxBayCount,
+        int $minLockerCount,
+        int $maxLockerCount,
+        int $minReservationCount,
+        int $maxReservationCount,
+    ): void
     {
         if (!$manager instanceof EntityManagerInterface) {
             throw new \RuntimeException('EntityManagerInterface is required to load fixtures.');
@@ -189,7 +220,7 @@ class AppFixtures extends Fixture
         foreach ($companyIds as $index => $companyId) {
             $city = self::CITIES[$index % count(self::CITIES)];
 
-            $bayCount = $faker->numberBetween(3, 6);
+            $bayCount = $faker->numberBetween($minBayCount, $maxBayCount);
             for ($bayIndex = 1; $bayIndex <= $bayCount; ++$bayIndex) {
                 /** @var Company $company */
                 $company = $entityManager->getReference(Company::class, $companyId);
@@ -207,7 +238,7 @@ class AppFixtures extends Fixture
 
                 $lockerBayId = (int) $lockerBay->getId();
 
-                $lockerCount = $faker->numberBetween(10, 30);
+                $lockerCount = $faker->numberBetween($minLockerCount, $maxLockerCount);
                 for ($lockerNumber = 1; $lockerNumber <= $lockerCount; ++$lockerNumber) {
                     $status = $this->randomLockerStatus($faker);
                     $specificationId = $specificationIds[array_rand($specificationIds)];
@@ -227,7 +258,7 @@ class AppFixtures extends Fixture
 
                     $entityManager->persist($locker);
 
-                    $reservationCount = $faker->numberBetween(1, 20);
+                    $reservationCount = $faker->numberBetween($minReservationCount, $maxReservationCount);
                     for ($r = 0; $r < $reservationCount; ++$r) {
                         $customerId = $customerIds[array_rand($customerIds)];
                         /** @var Customer $customer */
@@ -340,5 +371,53 @@ class AppFixtures extends Fixture
         $endsAt = $now->modify('+'.$faker->numberBetween(10, 240).' minutes');
 
         return [$startsAt, $endsAt, ReservationStatus::ACTIVE];
+    }
+
+    /**
+     * @return array{
+     *     mode:string,
+     *     companyCount:int,
+     *     customerCount:int,
+     *     minBayCount:int,
+     *     maxBayCount:int,
+     *     minLockerCount:int,
+     *     maxLockerCount:int,
+     *     minReservationCount:int,
+     *     maxReservationCount:int
+     * }
+     */
+    private function resolveFixturesProfile(): array
+    {
+        $modeRaw = $_SERVER['FIXTURES_MODE'] ?? $_ENV['FIXTURES_MODE'] ?? getenv('FIXTURES_MODE');
+        $mode = is_string($modeRaw) ? strtolower(trim($modeRaw)) : '';
+        if (!in_array($mode, ['full', 'light'], true)) {
+            $mode = 'light';
+        }
+
+        if ($mode === 'light') {
+            return [
+                'mode' => 'light',
+                'companyCount' => 2,
+                'customerCount' => 2,
+                'minBayCount' => 2,
+                'maxBayCount' => 2,
+                'minLockerCount' => 3,
+                'maxLockerCount' => 4,
+                'minReservationCount' => 0,
+                'maxReservationCount' => 4,
+            ];
+        }
+
+        return [
+            'mode' => 'full',
+            'companyCount' => 20,
+            'customerCount' => 10,
+            'minBayCount' => 3,
+            'maxBayCount' => 6,
+            'minLockerCount' => 10,
+            'maxLockerCount' => 30,
+            'minReservationCount' => 1,
+            'maxReservationCount' => 20,
+        ];
     }
 }
