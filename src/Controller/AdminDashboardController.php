@@ -24,8 +24,7 @@ class AdminDashboardController extends AbstractController
         ReservationRepository $reservationRepository,
         CustomerRepository $customerRepository,
         EntityManagerInterface $entityManager,
-    ): Response
-    {
+    ): Response {
         $totalLockers = $lockerRepository->count([]);
         $availableLockers = $lockerRepository->count(['status' => LockerStatus::AVAILABLE]);
         $occupiedLockers = $lockerRepository->count(['status' => LockerStatus::OCCUPIED]);
