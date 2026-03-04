@@ -21,14 +21,14 @@
     >
         <span>Societes</span>
     </a>
-{% endif %}
 
-<a
-    href="{{ path('app_admin_users_index') }}"
-    class="nav-link sidebar-btn d-flex align-items-center gap-2 rounded-3 px-3 py-2 {{ currentRoute starts with 'app_admin_users' ? 'sidebar-btn-active fw-semibold text-primary-emphasis' : 'text-body' }}"
->
-    <span>Utilisateurs BO</span>
-</a>
+    <a
+        href="{{ path('app_admin_users_index') }}"
+        class="nav-link sidebar-btn d-flex align-items-center gap-2 rounded-3 px-3 py-2 {{ currentRoute starts with 'app_admin_users' ? 'sidebar-btn-active fw-semibold text-primary-emphasis' : 'text-body' }}"
+    >
+        <span>Utilisateurs BO</span>
+    </a>
+{% endif %}
 
 <a
     href="{{ path('app_admin_customers_index') }}"
