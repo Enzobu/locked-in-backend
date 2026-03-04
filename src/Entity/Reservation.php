@@ -3,12 +3,25 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Enum\ReservationStatus;
 use App\Repository\ReservationRepository;
+use App\State\ReservationPostProcessor;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
-#[ApiResource]
+#[ApiResource(operations: [
+    new Get(),
+    new GetCollection(),
+    new Post(processor: ReservationPostProcessor::class),
+    new Patch(),
+    new Delete(),
+])]
 #[ORM\HasLifecycleCallbacks]
 class Reservation
 {
@@ -25,6 +38,7 @@ class Reservation
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
+    #[ApiProperty(writable: false)]
     private ?Customer $customer = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
