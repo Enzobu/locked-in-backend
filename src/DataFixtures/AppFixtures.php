@@ -385,6 +385,67 @@ class AppFixtures extends Fixture
         return [$startsAt, $endsAt, ReservationStatus::ACTIVE];
     }
 
+    private function computePlannedAmountCents(int $priceCentsPerHour, \DateTimeImmutable $startsAt, \DateTimeImmutable $endsAt): int
+    {
+        $durationMinutes = max(1, (int) ceil(($endsAt->getTimestamp() - $startsAt->getTimestamp()) / 60));
+
+        return (int) ceil(($durationMinutes * max(0, $priceCentsPerHour)) / 60);
+    }
+
+    private function mapPaymentStatusFromReservationStatus(ReservationStatus $reservationStatus): string
+    {
+        return match ($reservationStatus) {
+            ReservationStatus::PENDING => 'requires_payment_method',
+            ReservationStatus::CONFIRMED, ReservationStatus::ACTIVE, ReservationStatus::COMPLETED => 'succeeded',
+            ReservationStatus::CANCELLED => 'canceled',
+            ReservationStatus::EXPIRED => 'payment_failed',
+        };
+    }
+
+    private function hydrateOvertimeFixtureData(Reservation $reservation, Locker $locker, ReservationStatus $reservationStatus, object $faker): void
+    {
+        if ($reservationStatus !== ReservationStatus::COMPLETED) {
+            return;
+        }
+
+        $reservation->setActualEndsAt($reservation->getEndsAt());
+
+        if (!$faker->boolean(35)) {
+            return;
+        }
+
+        $overtimeMinutes = $faker->numberBetween(6, 120);
+        $actualEndsAt = $reservation->getEndsAt()?->modify(sprintf('+%d minutes', $overtimeMinutes));
+
+        if (!$actualEndsAt instanceof \DateTimeImmutable) {
+            return;
+        }
+
+        $billableMinutes = max(0, $overtimeMinutes - 5);
+        if ($billableMinutes === 0) {
+            $reservation
+                ->setActualEndsAt($actualEndsAt)
+                ->setOvertimeMinutes($overtimeMinutes)
+                ->setOvertimeAmountCents(0)
+                ->setOvertimePaymentStatus('none');
+
+            return;
+        }
+
+        $steps = (int) ceil($billableMinutes / 15);
+        $stepPriceCents = (int) ceil(max(0, (int) $locker->getPriceCents()) / 4);
+        $baseOvertimeAmountCents = $steps * $stepPriceCents;
+        $surchargePercent = max(0, (int) ($locker->getLockerBay()?->getOvertimeSurchargePercent() ?? 0));
+        $overtimeAmountCents = (int) ceil($baseOvertimeAmountCents * (100 + $surchargePercent) / 100);
+
+        $reservation
+            ->setActualEndsAt($actualEndsAt)
+            ->setOvertimeMinutes($overtimeMinutes)
+            ->setOvertimeAmountCents($overtimeAmountCents)
+            ->setOvertimePaymentIntentId(sprintf('pi_over_fixture_%d', $faker->numberBetween(100000, 999999)))
+            ->setOvertimePaymentStatus($faker->boolean(85) ? 'succeeded' : 'failed');
+    }
+
     /**
      * @return array{
      *     mode:string,
