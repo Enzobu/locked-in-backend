@@ -154,7 +154,7 @@ class AppFixtures extends Fixture
                 ->setLastname($faker->lastName())
                 ->setBirthDate(\DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-55 years', '-20 years')))
                 ->setRoles(['ROLE_CUSTOMER'])
-                ->setStripeCustomerId(sprintf('cus_fixture_%04d', $i));
+                ->setStripeCustomerId(null);
 
             $customer->addAddress($customerAddress);
             $customer->setPassword($this->passwordHasher->hashPassword($customer, 'password'));
