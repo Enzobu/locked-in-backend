@@ -1,4 +1,5 @@
 {% extends 'admin/layout.html.twig' %}
+{% import 'macros/modal.html.twig' as modal %}
 
 {% block title %}Clients{% endblock %}
 
@@ -65,10 +66,11 @@
                                             </form>
                                         {% else %}
                                             <a class="btn btn-sm btn-outline-primary" href="{{ path('app_admin_customers_edit', {'id': customer.id}) }}">Modifier</a>
-                                            <form method="post" action="{{ path('app_admin_customers_delete', {'id': customer.id}) }}" class="d-inline" onsubmit="return confirm('Désactiver ce client ?');">
+                                            <form id="deleteCustomerForm{{ customer.id }}" method="post" action="{{ path('app_admin_customers_delete', {'id': customer.id}) }}" class="d-inline">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('delete_customer_' ~ customer.id) }}">
-                                                <button class="btn btn-sm btn-outline-danger" type="submit">Désactiver</button>
+                                                <button class="btn btn-sm btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteCustomerModal{{ customer.id }}">Désactiver</button>
                                             </form>
+                                            {{ modal.confirm('deleteCustomerModal' ~ customer.id, 'Désactiver un client', 'Voulez-vous vraiment désactiver ce client ?', 'deleteCustomerForm' ~ customer.id, 'Désactiver', 'danger') }}
                                         {% endif %}
                                     </td>
                                 </tr>

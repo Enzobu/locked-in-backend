@@ -1,5 +1,6 @@
 {% extends 'admin/layout.html.twig' %}
 {% import 'macros/badge.html.twig' as label %}
+{% import 'macros/modal.html.twig' as modal %}
 
 {% block title %}{{ company.name }}{% endblock %}
 
@@ -12,10 +13,11 @@
         </div>
         <div class="d-flex gap-2">
             <a class="btn btn-outline-primary" href="{{ path('app_admin_companies_edit', {id: company.id}) }}">Modifier société</a>
-            <form method="post" action="{{ path('app_admin_companies_delete', {id: company.id}) }}" onsubmit="return confirm('Supprimer cette société ?');">
+            <form id="deleteCompanyForm{{ company.id }}" method="post" action="{{ path('app_admin_companies_delete', {id: company.id}) }}">
                 <input type="hidden" name="_token" value="{{ csrf_token('delete_company_' ~ company.id) }}">
-                <button class="btn btn-outline-danger" type="submit">Supprimer société</button>
+                <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteCompanyModal{{ company.id }}">Supprimer société</button>
             </form>
+            {{ modal.confirm('deleteCompanyModal' ~ company.id, 'Supprimer une société', 'Voulez-vous vraiment supprimer cette société ?', 'deleteCompanyForm' ~ company.id, 'Supprimer', 'danger') }}
         </div>
     </section>
 
@@ -52,10 +54,11 @@
                                     <div class="d-flex gap-2">
                                         <a class="btn btn-sm btn-outline-secondary" href="{{ path('app_admin_locker_bays_show', {id: bay.id}) }}">Voir</a>
                                         <a class="btn btn-sm btn-outline-primary" href="{{ path('app_admin_companies_locker_bays_edit', {id: bay.id}) }}">Modifier</a>
-                                        <form method="post" action="{{ path('app_admin_companies_locker_bays_delete', {id: bay.id}) }}" onsubmit="return confirm('Supprimer cette baie ?');">
+                                        <form id="deleteBayForm{{ bay.id }}" method="post" action="{{ path('app_admin_companies_locker_bays_delete', {id: bay.id}) }}">
                                             <input type="hidden" name="_token" value="{{ csrf_token('delete_bay_' ~ bay.id) }}">
-                                            <button class="btn btn-sm btn-outline-danger" type="submit">Supprimer</button>
+                                            <button class="btn btn-sm btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteBayModal{{ bay.id }}">Supprimer</button>
                                         </form>
+                                        {{ modal.confirm('deleteBayModal' ~ bay.id, 'Supprimer une baie', 'Voulez-vous vraiment supprimer cette baie ?', 'deleteBayForm' ~ bay.id, 'Supprimer', 'danger') }}
                                     </div>
                                 </div>
                             {% endfor %}

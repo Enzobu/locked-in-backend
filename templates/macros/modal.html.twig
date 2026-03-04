@@ -16,3 +16,16 @@
         </div>
     </div>
 {% endmacro %}
+
+{% macro confirm(id, title, message, formId, confirmLabel = 'Confirmer', confirmVariant = 'danger') %}
+    {% set body %}
+        <p class="mb-0">{{ message }}</p>
+    {% endset %}
+
+    {% set footer %}
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="submit" class="btn btn-{{ confirmVariant }}" form="{{ formId }}">{{ confirmLabel }}</button>
+    {% endset %}
+
+    {{ _self.base(id, title, body, footer) }}
+{% endmacro %}

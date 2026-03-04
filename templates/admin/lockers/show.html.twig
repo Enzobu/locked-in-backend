@@ -17,10 +17,11 @@
         {% if is_granted('ROLE_ADMIN') %}
             <div class="d-flex gap-2">
                 <a class="btn btn-outline-primary" href="{{ path('app_admin_companies_lockers_edit', {id: locker.id}) }}">Modifier casier</a>
-                <form method="post" action="{{ path('app_admin_companies_lockers_delete', {id: locker.id}) }}" onsubmit="return confirm('Supprimer ce casier ?');">
+                <form id="deleteLockerForm{{ locker.id }}" method="post" action="{{ path('app_admin_companies_lockers_delete', {id: locker.id}) }}">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete_locker_' ~ locker.id) }}">
-                    <button class="btn btn-outline-danger" type="submit">Supprimer casier</button>
+                    <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteLockerModal{{ locker.id }}">Supprimer casier</button>
                 </form>
+                {{ modal.confirm('deleteLockerModal' ~ locker.id, 'Supprimer un casier', 'Voulez-vous vraiment supprimer ce casier ?', 'deleteLockerForm' ~ locker.id, 'Supprimer', 'danger') }}
             </div>
         {% endif %}
     </section>

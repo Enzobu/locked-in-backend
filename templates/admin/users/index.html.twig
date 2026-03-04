@@ -1,4 +1,5 @@
 {% extends 'admin/layout.html.twig' %}
+{% import 'macros/modal.html.twig' as modal %}
 
 {% block title %}Utilisateurs backoffice{% endblock %}
 
@@ -62,10 +63,11 @@
                                             </form>
                                         {% else %}
                                             <a class="btn btn-sm btn-outline-primary" href="{{ path('app_admin_users_edit', {'id': user.id}) }}">Modifier</a>
-                                            <form method="post" action="{{ path('app_admin_users_delete', {'id': user.id}) }}" class="d-inline" onsubmit="return confirm('Désactiver cet utilisateur ?');">
+                                            <form id="deleteUserForm{{ user.id }}" method="post" action="{{ path('app_admin_users_delete', {'id': user.id}) }}" class="d-inline">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('delete_user_' ~ user.id) }}">
-                                                <button class="btn btn-sm btn-outline-danger" type="submit">Désactiver</button>
+                                                <button class="btn btn-sm btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ user.id }}">Désactiver</button>
                                             </form>
+                                            {{ modal.confirm('deleteUserModal' ~ user.id, 'Désactiver un utilisateur', 'Voulez-vous vraiment désactiver cet utilisateur ?', 'deleteUserForm' ~ user.id, 'Désactiver', 'danger') }}
                                         {% endif %}
                                     </td>
                                 </tr>
