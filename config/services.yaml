@@ -20,6 +20,10 @@ services:
         arguments:
             $secretKey: '%env(STRIPE_SECRET_KEY)%'
             $webhookSecret: '%env(STRIPE_WEBHOOK_SECRET)%'
+    App\Doctrine\ReservationOwnerExtension:
+        tags:
+            - { name: 'api_platform.doctrine.orm.query_extension.collection' }
+            - { name: 'api_platform.doctrine.orm.query_extension.item' }
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
