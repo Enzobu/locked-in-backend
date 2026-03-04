@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use App\Controller\ApiCustomerMeController;
+use App\Controller\ApiCustomerUpdateController;
 use App\Controller\ApiRegisterController;
 use App\Repository\CustomerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -34,7 +35,18 @@ use Symfony\Component\Security\Core\User\UserInterface;
     new Get(),
     new GetCollection(),
     new Post(),
-    new Patch(),
+    new Patch(
+        uriTemplate: '/customers',
+        controller: ApiCustomerUpdateController::class,
+        read: false,
+        deserialize: false,
+        security: "is_granted('ROLE_CUSTOMER')",
+        output: false,
+        openapi: new OpenApiOperation(
+            summary: 'Update current authenticated customer profile',
+            description: 'Updates the customer linked to the JWT token without requiring a customer id in the URL.',
+        ),
+    ),
     new Delete(),
     new Post(
         uriTemplate: '/register',

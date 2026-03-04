@@ -291,6 +291,40 @@
               }
             }
           ]
+        },
+        {
+          "name": "Update my customer profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/merge-patch+json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstname\": \"Client\",\n  \"lastname\": \"Mobile\",\n  \"email\": \"{{customerEmail}}\",\n  \"birthDate\": \"1997-05-12T00:00:00+00:00\"\n}"
+            },
+            "url": "{{baseUrl}}{{apiPrefix}}/customers"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Customer profile updated', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  var data = pm.response.json();",
+                  "  pm.expect(data).to.have.property('email');",
+                  "  pm.expect(data).to.have.property('firstname');",
+                  "  pm.expect(data).to.have.property('lastname');",
+                  "});"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
