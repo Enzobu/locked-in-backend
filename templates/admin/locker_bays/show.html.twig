@@ -1,5 +1,6 @@
 {% extends 'admin/layout.html.twig' %}
 {% import 'macros/badge.html.twig' as label %}
+{% import 'macros/modal.html.twig' as modal %}
 
 {% block title %}Baie {{ bay.name }}{% endblock %}
 
@@ -27,6 +28,9 @@
         </div>
         <div class="d-flex gap-2">
             <span class="badge text-bg-secondary" style="margin-top: auto; margin-bottom: auto;">{{ lockers|length ~ ' casier(s) affiches' }}</span>
+            {% if not is_granted('ROLE_ADMIN') %}
+                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#durationsModal">Modifier durees</button>
+            {% endif %}
             {% if is_granted('ROLE_ADMIN') %}
                 <a class="btn btn-outline-primary" href="{{ path('app_admin_companies_locker_bays_edit', {id: bay.id}) }}">Modifier baie</a>
                 <a class="btn btn-primary" href="{{ path('app_admin_companies_lockers_new', {id: bay.id}) }}">Ajouter casier</a>
@@ -107,6 +111,9 @@
                         <p class="small text-body-secondary mb-0">Derniere vue: {{ locker.lastSeenAt ? locker.lastSeenAt|date('d/m/Y H:i') : '-' }}</p>
                         <div class="mt-3 d-flex gap-2 flex-wrap">
                             <a class="btn btn-sm btn-outline-secondary" href="{{ path('app_admin_lockers_show', {id: locker.id}) }}">Voir</a>
+                            {% if not is_granted('ROLE_ADMIN') %}
+                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#lockerPriceModal{{ locker.id }}">Modifier prix</button>
+                            {% endif %}
                             {% if is_granted('ROLE_ADMIN') %}
                                 <a class="btn btn-sm btn-outline-primary" href="{{ path('app_admin_companies_lockers_edit', {id: locker.id}) }}">Modifier</a>
                                 <form method="post" action="{{ path('app_admin_companies_lockers_delete', {id: locker.id}) }}" onsubmit="return confirm('Supprimer ce casier ?');">
@@ -124,4 +131,47 @@
             </div>
         {% endfor %}
     </section>
+
+    {% if not is_granted('ROLE_ADMIN') %}
+        {% set durationsBody %}
+            <form id="durationsForm" method="post" action="{{ path('app_admin_locker_bays_update_durations', {id: bay.id}) }}" class="row g-3">
+                <input type="hidden" name="_token" value="{{ csrf_token('update_durations_' ~ bay.id) }}">
+                <div class="col-12 col-md-6">
+                    <label for="minDurationInput" class="form-label">Duree min (minutes)</label>
+                    <input id="minDurationInput" type="number" name="minDuration" min="0" class="form-control" value="{{ bay.minDuration }}">
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="maxDurationInput" class="form-label">Duree max (minutes)</label>
+                    <input id="maxDurationInput" type="number" name="maxDuration" min="0" class="form-control" value="{{ bay.maxDuration }}">
+                </div>
+            </form>
+        {% endset %}
+
+        {% set durationsFooter %}
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-primary" form="durationsForm">Enregistrer</button>
+        {% endset %}
+
+        {{ modal.base('durationsModal', 'Modifier les durees de la baie', durationsBody, durationsFooter) }}
+
+        {% for locker in lockers %}
+            {% set lockerPriceBody %}
+                <form id="lockerPriceForm{{ locker.id }}" method="post" action="{{ path('app_admin_lockers_update_price', {id: locker.id}) }}" class="row g-3">
+                    <input type="hidden" name="_token" value="{{ csrf_token('update_price_' ~ locker.id) }}">
+                    <div class="col-12">
+                        <label for="lockerPriceInput{{ locker.id }}" class="form-label">Prix (EUR)</label>
+                        <input id="lockerPriceInput{{ locker.id }}" type="text" name="priceEuro" class="form-control" value="{{ (locker.priceCents / 100)|number_format(2, ',', '') }}" placeholder="0,00">
+                        <div class="form-text">Saisir en euros (ex: 3,50). Conversion automatique en centimes.</div>
+                    </div>
+                </form>
+            {% endset %}
+
+            {% set lockerPriceFooter %}
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="submit" class="btn btn-primary" form="lockerPriceForm{{ locker.id }}">Enregistrer</button>
+            {% endset %}
+
+            {{ modal.base('lockerPriceModal' ~ locker.id, 'Modifier le prix du casier #' ~ locker.number, lockerPriceBody, lockerPriceFooter) }}
+        {% endfor %}
+    {% endif %}
 {% endblock %}

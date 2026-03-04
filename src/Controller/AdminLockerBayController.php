@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Enum\LockerStatus;
 use App\Entity\User;
 use App\Repository\LockerBayRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -71,5 +72,55 @@ class AdminLockerBayController extends AbstractController
             'q' => $request->query->get('q'),
             'statusEnum' => LockerStatus::class,
         ]);
+    }
+
+    #[Route('/{id}/durations', name: 'app_admin_locker_bays_update_durations', methods: ['POST'])]
+    public function updateDurations(
+        int $id,
+        Request $request,
+        LockerBayRepository $lockerBayRepository,
+        EntityManagerInterface $entityManager,
+    ): Response {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $bay = $lockerBayRepository->findOneVisibleForBackoffice($id, $user);
+        if ($bay === null) {
+            throw $this->createNotFoundException('Baie introuvable.');
+        }
+
+        if (!$this->isCsrfTokenValid('update_durations_'.$bay->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $id]);
+        }
+
+        $minRaw = $request->request->get('minDuration');
+        $maxRaw = $request->request->get('maxDuration');
+
+        $minDuration = ($minRaw === null || $minRaw === '') ? null : (int) $minRaw;
+        $maxDuration = ($maxRaw === null || $maxRaw === '') ? null : (int) $maxRaw;
+
+        if (($minDuration !== null && $minDuration < 0) || ($maxDuration !== null && $maxDuration < 0)) {
+            $this->addFlash('danger', 'Les durees doivent etre positives.');
+
+            return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $id]);
+        }
+
+        if ($minDuration !== null && $maxDuration !== null && $maxDuration < $minDuration) {
+            $this->addFlash('danger', 'La duree max doit etre superieure ou egale a la duree min.');
+
+            return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $id]);
+        }
+
+        $bay->setMinDuration($minDuration);
+        $bay->setMaxDuration($maxDuration);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Durees de la baie mises a jour.');
+
+        return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $id]);
     }
 }

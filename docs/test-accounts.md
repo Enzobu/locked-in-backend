@@ -4,18 +4,18 @@
 
 - Super admin
   - Email: `superadmin@openinnov.com`
-  - Password: `superadmin1234`
+  - Password: `password`
 
 - Company admins
   - Email pattern: `admin@societeXX.com` (from `01` to `20`)
   - Examples: `admin@societe01.com`, `admin@societe02.com`
-  - Password (all): `admin1234`
+  - Password (all): `password`
 
 ## Customers (API)
 
 - Email pattern: `customerN@openinnov.com` (from `1` to `10`)
 - Examples: `customer1@openinnov.com`, `customer10@openinnov.com`
-- Password (all): `customer1234`
+- Password (all): `password`
 
 ## Notes
 
