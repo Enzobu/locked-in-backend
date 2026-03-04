@@ -23,7 +23,7 @@ services:
     image: phpmyadmin:5.2.3
     container_name: locked-in-phpmyadmin
     ports:
-      - 8080:80
+      - 15435:80
     environment:
       - PMA_ARBITRARY=1
       - PMA_HOST=database
@@ -46,7 +46,7 @@ services:
       - ./docker/apache/php.ini:/usr/local/etc/php/conf.d/php.custom.ini
       - ./docker/apache/.htaccess:/var/www/public/.htaccess
     ports:
-      - 8000:80
+      - 15436:80
     depends_on:
       - database
     networks:
