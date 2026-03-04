@@ -148,6 +148,61 @@ $headings-font-family: "Poppins", sans-serif;
   overflow-y: auto;
 }
 
+.admin-sidebar-brand {
+  padding: 1rem 1.25rem;
+}
+
+.admin-sidebar-footer {
+  padding: 1rem 1.25rem;
+  background: rgba(37, 99, 235, 0.03);
+}
+
+.admin-nav {
+  padding: 1rem .75rem;
+}
+
+.admin-nav-section {
+  margin-bottom: 1.25rem;
+}
+
+.admin-nav-title {
+  margin: 0 0 .45rem;
+  padding: 0 .75rem;
+  font-size: .75rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--bs-secondary-color);
+  font-weight: 600;
+}
+
+.admin-nav-link {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-radius: .65rem;
+  padding: .55rem .75rem;
+  margin-bottom: .2rem;
+  color: var(--bs-body-color);
+  text-decoration: none;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.admin-nav-link:hover {
+  background: rgba(30, 79, 188, 0.09);
+  color: var(--bs-emphasis-color);
+}
+
+.admin-nav-link.is-active {
+  background: rgba(30, 79, 188, 0.14);
+  color: var(--bs-primary-text-emphasis);
+  font-weight: 600;
+}
+
+.admin-topbar {
+  background: color-mix(in srgb, var(--bs-body-bg) 95%, var(--bs-primary) 5%);
+  backdrop-filter: blur(8px);
+}
+
 .admin-main-column {
   height: 100vh;
   display: flex;
@@ -169,11 +224,11 @@ $headings-font-family: "Poppins", sans-serif;
   transition: transform 120ms ease, box-shadow 120ms ease;
 }
 
-.locker-bay-card:hover,
-.locker-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.08);
-}
+  .locker-bay-card:hover,
+  .locker-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.08);
+  }
 
 .locker-status-available {
   border-top: 3px solid rgba(22, 163, 74, 0.75);

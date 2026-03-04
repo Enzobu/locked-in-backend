@@ -1,0 +1,14 @@
+{% macro icon(
+    name,
+    family = 'regular',
+    size = null,
+    additional_classes = [],
+) %}
+    {% set classes = ['fa-'~family, 'fa-'~name]|merge(additional_classes) %}
+
+    {% if size %}
+        {% set classes = classes|merge(['fa-' ~ size]) %}
+    {% endif %}
+
+    <i class="{{ classes|join(' ') }}"></i>
+{% endmacro %}
