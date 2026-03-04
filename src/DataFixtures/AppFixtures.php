@@ -121,7 +121,7 @@ class AppFixtures extends Fixture
                 ->setLastname(sprintf('Societe%02d', $i))
                 ->setRoles(['ROLE_USER'])
                 ->setCompany($company);
-            $user->setPassword($this->passwordHasher->hashPassword($user, 'admin1234'));
+            $user->setPassword($this->passwordHasher->hashPassword($user, 'password'));
 
             $manager->persist($address);
             $manager->persist($company);
@@ -136,7 +136,7 @@ class AppFixtures extends Fixture
             ->setLastname('Admin')
             ->setRoles(['ROLE_ADMIN', 'ROLE_USER'])
             ->setCompany($companies[0]);
-        $superAdmin->setPassword($this->passwordHasher->hashPassword($superAdmin, 'superadmin1234'));
+        $superAdmin->setPassword($this->passwordHasher->hashPassword($superAdmin, 'password'));
         $manager->persist($superAdmin);
 
         for ($i = 1; $i <= 10; ++$i) {
@@ -156,7 +156,7 @@ class AppFixtures extends Fixture
                 ->setRoles(['ROLE_CUSTOMER']);
 
             $customer->addAddress($customerAddress);
-            $customer->setPassword($this->passwordHasher->hashPassword($customer, 'customer1234'));
+            $customer->setPassword($this->passwordHasher->hashPassword($customer, 'password'));
 
             $manager->persist($customerAddress);
             $manager->persist($customer);
