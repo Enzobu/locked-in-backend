@@ -10,5 +10,10 @@ if [[ "$OWNER_GID" != "0" ]]; then
     groupmod -o --gid ${OWNER_GID} www-data || echo "Warning: Failed to set GID for www-data"
 fi
 
+# Fix permissions (Symfony cache/log)
+mkdir -p /var/www/var/cache /var/www/var/log
+chown -R www-data:www-data /var/www/var
+chmod -R 775 /var/www/var
+
 echo "Starting Apache as www-data (UID: ${OWNER_UID}, GID: ${OWNER_GID})"
 exec apache2-foreground
