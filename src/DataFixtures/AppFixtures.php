@@ -461,10 +461,10 @@ class AppFixtures extends Fixture
                 'customerCount' => 2,
                 'minBayCount' => 2,
                 'maxBayCount' => 2,
-                'minLockerCount' => 3,
-                'maxLockerCount' => 4,
+                'minLockerCount' => 1,
+                'maxLockerCount' => 2,
                 'minReservationCount' => 0,
-                'maxReservationCount' => 4,
+                'maxReservationCount' => 1,
             ];
         }
 

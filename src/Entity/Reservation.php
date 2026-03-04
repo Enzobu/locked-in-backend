@@ -16,11 +16,11 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
 #[ApiResource(operations: [
-    new Get(),
-    new GetCollection(),
+    new Get(security: "object.getCustomer() == user"),
+    new GetCollection(security: "is_granted('ROLE_CUSTOMER')"),
     new Post(processor: ReservationPostProcessor::class),
-    new Patch(),
-    new Delete(),
+    new Patch(security: "object.getCustomer() == user"),
+    new Delete(security: "object.getCustomer() == user"),
 ])]
 #[ORM\HasLifecycleCallbacks]
 class Reservation
