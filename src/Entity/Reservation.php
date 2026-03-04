@@ -49,6 +49,33 @@ class Reservation
     private ReservationStatus $status = ReservationStatus::PENDING;
 
     #[ORM\Column]
+    private int $plannedAmountCents = 0;
+
+    #[ORM\Column(length: 3)]
+    private string $currency = 'eur';
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $paymentIntentId = null;
+
+    #[ORM\Column(length: 50)]
+    private string $paymentStatus = 'unpaid';
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $actualEndsAt = null;
+
+    #[ORM\Column]
+    private int $overtimeMinutes = 0;
+
+    #[ORM\Column]
+    private int $overtimeAmountCents = 0;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $overtimePaymentIntentId = null;
+
+    #[ORM\Column(length: 50)]
+    private string $overtimePaymentStatus = 'none';
+
+    #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
@@ -158,6 +185,114 @@ class Reservation
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function getPlannedAmountCents(): int
+    {
+        return $this->plannedAmountCents;
+    }
+
+    public function setPlannedAmountCents(int $plannedAmountCents): static
+    {
+        $this->plannedAmountCents = $plannedAmountCents;
+
+        return $this;
+    }
+
+    public function getCurrency(): string
+    {
+        return $this->currency;
+    }
+
+    public function setCurrency(string $currency): static
+    {
+        $this->currency = strtolower(trim($currency));
+
+        return $this;
+    }
+
+    public function getPaymentIntentId(): ?string
+    {
+        return $this->paymentIntentId;
+    }
+
+    public function setPaymentIntentId(?string $paymentIntentId): static
+    {
+        $this->paymentIntentId = $paymentIntentId;
+
+        return $this;
+    }
+
+    public function getPaymentStatus(): string
+    {
+        return $this->paymentStatus;
+    }
+
+    public function setPaymentStatus(string $paymentStatus): static
+    {
+        $this->paymentStatus = strtolower(trim($paymentStatus));
+
+        return $this;
+    }
+
+    public function getActualEndsAt(): ?\DateTimeImmutable
+    {
+        return $this->actualEndsAt;
+    }
+
+    public function setActualEndsAt(?\DateTimeImmutable $actualEndsAt): static
+    {
+        $this->actualEndsAt = $actualEndsAt;
+
+        return $this;
+    }
+
+    public function getOvertimeMinutes(): int
+    {
+        return $this->overtimeMinutes;
+    }
+
+    public function setOvertimeMinutes(int $overtimeMinutes): static
+    {
+        $this->overtimeMinutes = max(0, $overtimeMinutes);
+
+        return $this;
+    }
+
+    public function getOvertimeAmountCents(): int
+    {
+        return $this->overtimeAmountCents;
+    }
+
+    public function setOvertimeAmountCents(int $overtimeAmountCents): static
+    {
+        $this->overtimeAmountCents = max(0, $overtimeAmountCents);
+
+        return $this;
+    }
+
+    public function getOvertimePaymentIntentId(): ?string
+    {
+        return $this->overtimePaymentIntentId;
+    }
+
+    public function setOvertimePaymentIntentId(?string $overtimePaymentIntentId): static
+    {
+        $this->overtimePaymentIntentId = $overtimePaymentIntentId;
+
+        return $this;
+    }
+
+    public function getOvertimePaymentStatus(): string
+    {
+        return $this->overtimePaymentStatus;
+    }
+
+    public function setOvertimePaymentStatus(string $overtimePaymentStatus): static
+    {
+        $this->overtimePaymentStatus = strtolower(trim($overtimePaymentStatus));
+
+        return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeImmutable

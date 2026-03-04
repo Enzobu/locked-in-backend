@@ -25,11 +25,11 @@
     },
     {
       "key": "customerEmail",
-      "value": "lea.dupont@example.com"
+      "value": "customer1@openinnov.com"
     },
     {
       "key": "customerPassword",
-      "value": "customer1234"
+      "value": "password"
     },
     {
       "key": "registerEmail",
@@ -418,7 +418,7 @@
       "name": "Reservation Flow",
       "item": [
         {
-          "name": "Create reservation",
+          "name": "Create payment intent + reservation",
           "request": {
             "method": "POST",
             "header": [
@@ -429,9 +429,9 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"startsAt\": \"2026-03-04T09:00:00+00:00\",\n  \"endsAt\": \"2026-03-04T11:00:00+00:00\",\n  \"locker\": \"{{apiPrefix}}/lockers/{{lockerId}}\",\n  \"status\": \"confirmed\"\n}"
+              "raw": "{\n  \"startsAt\": \"2026-03-04T09:00:00+00:00\",\n  \"endsAt\": \"2026-03-04T11:00:00+00:00\",\n  \"locker\": \"{{apiPrefix}}/lockers/{{lockerId}}\"\n}"
             },
-            "url": "{{baseUrl}}{{apiPrefix}}/reservations"
+            "url": "{{baseUrl}}{{apiPrefix}}/payments/intents"
           },
           "event": [
             {
@@ -439,20 +439,41 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Reservation created', function () {",
+                  "pm.test('Payment intent created', function () {",
                   "  pm.response.to.have.status(201);",
                   "  var data = pm.response.json();",
-                  "  pm.expect(data).to.have.property('id');",
+                  "  pm.expect(data).to.have.property('clientSecret');",
+                  "  pm.expect(data).to.have.property('reservationId');",
                   "});",
                   "",
                   "var json = pm.response.json();",
-                  "if (json && json.id) {",
-                  "  pm.environment.set('reservationId', String(json.id));",
+                  "if (json && json.reservationId) {",
+                  "  pm.environment.set('reservationId', String(json.reservationId));",
+                  "}",
+                  "if (json && json.clientSecret) {",
+                  "  pm.environment.set('stripeClientSecret', String(json.clientSecret));",
                   "}"
                 ]
               }
             }
           ]
+        },
+        {
+          "name": "Close reservation (with overtime)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actualEndsAt\": \"2026-03-04T11:30:00+00:00\"\n}"
+            },
+            "url": "{{baseUrl}}{{apiPrefix}}/reservations/{{reservationId}}/close"
+          }
         },
         {
           "name": "Create locker action",

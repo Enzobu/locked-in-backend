@@ -123,4 +123,48 @@ class AdminLockerBayController extends AbstractController
 
         return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $id]);
     }
+
+    #[Route('/{id}/overtime-surcharge', name: 'app_admin_locker_bays_update_overtime_surcharge', methods: ['POST'])]
+    public function updateOvertimeSurcharge(
+        int $id,
+        Request $request,
+        LockerBayRepository $lockerBayRepository,
+        EntityManagerInterface $entityManager,
+    ): Response {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('Cette action est réservée aux utilisateurs non-admin.');
+        }
+
+        $bay = $lockerBayRepository->findOneVisibleForBackoffice($id, $user);
+        if ($bay === null) {
+            throw $this->createNotFoundException('Baie introuvable.');
+        }
+
+        if (!$this->isCsrfTokenValid('update_overtime_surcharge_'.$bay->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Jeton CSRF invalide.');
+
+            return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $id]);
+        }
+
+        $surchargeRaw = $request->request->get('overtimeSurchargePercent');
+        $surchargePercent = ($surchargeRaw === null || $surchargeRaw === '') ? 0 : (int) $surchargeRaw;
+
+        if ($surchargePercent < 0) {
+            $this->addFlash('danger', 'La majoration doit être positive.');
+
+            return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $id]);
+        }
+
+        $bay->setOvertimeSurchargePercent($surchargePercent);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Majoration de dépassement mise à jour.');
+
+        return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $id]);
+    }
 }
