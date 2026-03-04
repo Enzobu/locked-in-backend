@@ -208,8 +208,7 @@ class AppFixtures extends Fixture
         int $maxLockerCount,
         int $minReservationCount,
         int $maxReservationCount,
-    ): void
-    {
+    ): void {
         if (!$manager instanceof EntityManagerInterface) {
             throw new \RuntimeException('EntityManagerInterface is required to load fixtures.');
         }
