@@ -11,7 +11,7 @@
                 {% if isAdmin %}
                     Vue globale de toutes les baies de casiers.
                 {% else %}
-                    Vue des baies rattachees a votre societe.
+                    Vue des baies rattachées à votre société.
                 {% endif %}
             </p>
         </div>
@@ -20,7 +20,7 @@
 
     <form class="row g-2 mb-4" method="get">
         <div class="col-12 col-md-6 col-xl-4">
-            <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Rechercher une baie ou une societe">
+            <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Rechercher une baie ou une société">
         </div>
         <div class="col-auto">
             <button class="btn btn-outline-primary" type="submit">Rechercher</button>
@@ -63,9 +63,9 @@
 
                             <div class="d-flex flex-wrap gap-2">
                                 {{ label.default(available ~ ' dispo', 'success') }}
-                                {{ label.default(reserved ~ ' reserves') }}
-                                {{ label.default(occupied ~ ' occupes', 'warning') }}
-                                {{ label.default(offline ~ ' offline', 'danger') }}
+                                {{ label.default(reserved ~ ' réservés') }}
+                                {{ label.default(occupied ~ ' occupés', 'warning') }}
+                                {{ label.default(offline ~ ' Offline', 'danger') }}
                                 {{ label.default(outOfOrder ~ ' HS', 'dark') }}
                             </div>
                         </div>
@@ -75,7 +75,7 @@
         {% else %}
             <div class="col-12">
                 <div class="card shadow-sm">
-                    <div class="card-body text-body-secondary">Aucune baie de casiers trouvee.</div>
+                    <div class="card-body text-body-secondary">Aucune baie de casiers trouvée.</div>
                 </div>
             </div>
         {% endfor %}

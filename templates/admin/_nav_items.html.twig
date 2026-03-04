@@ -1,54 +1,64 @@
+{% import "macros/fontawesome.html.twig" as fa %}
 {% set currentRoute = app.request.attributes.get('_route') %}
 
-<a
-    href="{{ path('app_admin_dashboard') }}"
-    class="nav-link sidebar-btn d-flex align-items-center gap-2 rounded-3 px-3 py-2 {{ currentRoute starts with 'app_admin_dashboard' ? 'sidebar-btn-active fw-semibold text-primary-emphasis' : 'text-body' }}"
->
-    <span>Tableau de bord</span>
-</a>
+<div class="admin-nav-section">
+    <p class="admin-nav-title">Exploitation</p>
 
-<a
-    href="{{ path('app_admin_locker_bays_index') }}"
-    class="nav-link sidebar-btn d-flex align-items-center gap-2 rounded-3 px-3 py-2 {{ currentRoute starts with 'app_admin_locker_bays' or currentRoute starts with 'app_admin_lockers' ? 'sidebar-btn-active fw-semibold text-primary-emphasis' : 'text-body' }}"
->
-    <span>Casiers</span>
-</a>
+    <a
+        href="{{ path('app_admin_dashboard') }}"
+        class="admin-nav-link {{ currentRoute starts with 'app_admin_dashboard' ? 'is-active' : '' }}"
+    >
+        <span>{{ fa.icon(name: 'chart-line', family: 'solid', size: 'md', additional_classes: ['me-2']) }}Tableau de bord</span>
+    </a>
+
+    <a
+        href="{{ path('app_admin_locker_bays_index') }}"
+        class="admin-nav-link {{ currentRoute starts with 'app_admin_locker_bays' or currentRoute starts with 'app_admin_lockers' ? 'is-active' : '' }}"
+    >
+        <span>{{ fa.icon(name: 'unlock', family: 'solid', size: 'md', additional_classes: ['me-2']) }}Casiers</span>
+    </a>
+
+    <a
+        href="{{ path('app_admin_customers_index') }}"
+        class="admin-nav-link {{ currentRoute starts with 'app_admin_customers' ? 'is-active' : '' }}"
+    >
+        <span>{{ fa.icon(name: 'circle-user', family: 'solid', size: 'md', additional_classes: ['me-2']) }}Clients</span>
+    </a>
+</div>
 
 {% if is_granted('ROLE_ADMIN') %}
-    <a
-        href="{{ path('app_admin_companies_index') }}"
-        class="nav-link sidebar-btn d-flex align-items-center gap-2 rounded-3 px-3 py-2 {{ currentRoute starts with 'app_admin_companies' ? 'sidebar-btn-active fw-semibold text-primary-emphasis' : 'text-body' }}"
-    >
-        <span>Societes</span>
-    </a>
+    <div class="admin-nav-section">
+        <p class="admin-nav-title">Administration</p>
 
-    <a
-        href="{{ path('app_admin_users_index') }}"
-        class="nav-link sidebar-btn d-flex align-items-center gap-2 rounded-3 px-3 py-2 {{ currentRoute starts with 'app_admin_users' ? 'sidebar-btn-active fw-semibold text-primary-emphasis' : 'text-body' }}"
-    >
-        <span>Utilisateurs BO</span>
-    </a>
+        <a
+            href="{{ path('app_admin_companies_index') }}"
+            class="admin-nav-link {{ currentRoute starts with 'app_admin_companies' ? 'is-active' : '' }}"
+        >
+            <span>{{ fa.icon(name: 'building', family: 'solid', size: 'md', additional_classes: ['me-2']) }}Sociétés</span>
+        </a>
+
+        <a
+            href="{{ path('app_admin_users_index') }}"
+            class="admin-nav-link {{ currentRoute starts with 'app_admin_users' ? 'is-active' : '' }}"
+        >
+            <span>{{ fa.icon(name: 'user', family: 'solid', size: 'md', additional_classes: ['me-2']) }}Utilisateurs BO</span>
+        </a>
+    </div>
 {% endif %}
 
-<a
-    href="{{ path('app_admin_customers_index') }}"
-    class="nav-link sidebar-btn d-flex align-items-center gap-2 rounded-3 px-3 py-2 {{ currentRoute starts with 'app_admin_customers' ? 'sidebar-btn-active fw-semibold text-primary-emphasis' : 'text-body' }}"
->
-    <span>Clients</span>
-</a>
+<div class="admin-nav-section">
+    <p class="admin-nav-title">Ressources</p>
 
-<a
-    href="/api"
-    class="nav-link sidebar-btn d-flex align-items-center gap-2 rounded-3 px-3 py-2 text-body"
-    target="_blank"
-    rel="noreferrer"
->
-    <span>API Docs</span>
-</a>
+    <a
+        href="/api"
+        class="admin-nav-link"
+        target="_blank"
+        rel="noreferrer"
+    >
+        <span>{{ fa.icon(name: 'code', family: 'solid', size: 'md', additional_classes: ['me-2']) }}API Docs</span>
+    </a>
+</div>
 
-<a
-    href="{{ path('app_admin_logout') }}"
-    class="nav-link sidebar-btn d-flex align-items-center gap-2 rounded-3 px-3 py-2 text-danger"
->
-    <span>Deconnexion</span>
-</a>
+<div class="admin-nav-mobile-footer d-lg-none p-3 border-top">
+    <a href="{{ path('app_admin_logout') }}" class="btn btn-outline-danger w-100 btn-sm">Se déconnecter</a>
+</div>

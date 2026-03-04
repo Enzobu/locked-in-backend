@@ -92,7 +92,7 @@ class AdminLockerBayController extends AbstractController
         }
 
         if (!$this->isCsrfTokenValid('update_durations_'.$bay->getId(), (string) $request->request->get('_token'))) {
-            $this->addFlash('danger', 'Token CSRF invalide.');
+            $this->addFlash('danger', 'Jeton CSRF invalide.');
 
             return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $id]);
         }
@@ -104,13 +104,13 @@ class AdminLockerBayController extends AbstractController
         $maxDuration = ($maxRaw === null || $maxRaw === '') ? null : (int) $maxRaw;
 
         if (($minDuration !== null && $minDuration < 0) || ($maxDuration !== null && $maxDuration < 0)) {
-            $this->addFlash('danger', 'Les durees doivent etre positives.');
+            $this->addFlash('danger', 'Les durées doivent être positives.');
 
             return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $id]);
         }
 
         if ($minDuration !== null && $maxDuration !== null && $maxDuration < $minDuration) {
-            $this->addFlash('danger', 'La duree max doit etre superieure ou egale a la duree min.');
+            $this->addFlash('danger', 'La durée max doit être supérieure ou égale à la durée min.');
 
             return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $id]);
         }
@@ -119,7 +119,7 @@ class AdminLockerBayController extends AbstractController
         $bay->setMaxDuration($maxDuration);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Durees de la baie mises a jour.');
+        $this->addFlash('success', 'Durées de la baie mises à jour.');
 
         return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $id]);
     }

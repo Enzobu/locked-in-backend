@@ -70,7 +70,7 @@ class AdminLockerController extends AbstractController
         }
 
         if (!$this->isCsrfTokenValid('update_price_'.$locker->getId(), (string) $request->request->get('_token'))) {
-            $this->addFlash('danger', 'Token CSRF invalide.');
+            $this->addFlash('danger', 'Jeton CSRF invalide.');
 
             return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $locker->getLockerBay()?->getId()]);
         }
@@ -87,7 +87,7 @@ class AdminLockerController extends AbstractController
 
         $priceCents = (int) round(((float) $priceEuroNormalized) * 100);
         if ($priceCents < 0) {
-            $this->addFlash('danger', 'Le prix doit etre positif.');
+            $this->addFlash('danger', 'Le prix doit être positif.');
 
             return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $locker->getLockerBay()?->getId()]);
         }
@@ -95,7 +95,7 @@ class AdminLockerController extends AbstractController
         $locker->setPriceCents($priceCents);
         $entityManager->flush();
 
-        $this->addFlash('success', sprintf('Prix du casier #%d mis a jour.', $locker->getNumber()));
+        $this->addFlash('success', sprintf('Prix du casier #%d mis à jour.', $locker->getNumber()));
 
         $referer = (string) $request->headers->get('referer', '');
         if (str_contains($referer, '/admin/lockers/')) {

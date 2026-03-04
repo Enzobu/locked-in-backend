@@ -1,15 +1,15 @@
 {% extends 'admin/layout.html.twig' %}
 {% import 'macros/badge.html.twig' as label %}
 
-{% block title %}Societes{% endblock %}
+{% block title %}Sociétés{% endblock %}
 
 {% block admin_content %}
     <section class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-4">
         <div>
-            <h2 class="h3 mb-1">Societes</h2>
-            <p class="text-body-secondary mb-0">Section reservee aux administrateurs.</p>
+            <h2 class="h3 mb-1">Sociétés</h2>
+            <p class="text-body-secondary mb-0">Section réservée aux administrateurs.</p>
         </div>
-        <a href="{{ path('app_admin_companies_new') }}" class="btn btn-primary">Nouvelle societe</a>
+        <a href="{{ path('app_admin_companies_new') }}" class="btn btn-primary">Nouvelle société</a>
     </section>
 
     <form class="row g-2 mb-4" method="get">
@@ -36,7 +36,7 @@
                 </a>
             </div>
         {% else %}
-            <div class="col-12"><div class="card shadow-sm"><div class="card-body text-body-secondary">Aucune societe trouvee.</div></div></div>
+            <div class="col-12"><div class="card shadow-sm"><div class="card-body text-body-secondary">Aucune société trouvée.</div></div></div>
         {% endfor %}
     </section>
 {% endblock %}
