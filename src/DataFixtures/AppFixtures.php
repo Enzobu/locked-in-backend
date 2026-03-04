@@ -172,7 +172,8 @@ class AppFixtures extends Fixture
                 ->setFirstname($faker->firstName())
                 ->setLastname($faker->lastName())
                 ->setBirthDate(\DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-55 years', '-20 years')))
-                ->setRoles(['ROLE_CUSTOMER']);
+                ->setRoles(['ROLE_CUSTOMER'])
+                ->setStripeCustomerId(null);
 
             $customer->addAddress($customerAddress);
             $customer->setPassword($this->passwordHasher->hashPassword($customer, 'password'));
@@ -230,7 +231,8 @@ class AppFixtures extends Fixture
                     ->setLatitude(number_format($city['lat'] + ($faker->numberBetween(-800, 800) / 100000), 7, '.', ''))
                     ->setLongitude(number_format($city['lng'] + ($faker->numberBetween(-800, 800) / 100000), 7, '.', ''))
                     ->setMinDuration($faker->randomElement([15, 30, 60]))
-                    ->setMaxDuration($faker->randomElement([720, 1440, 2880]));
+                    ->setMaxDuration($faker->randomElement([720, 1440, 2880]))
+                    ->setOvertimeSurchargePercent($faker->randomElement([0, 0, 10, 15, 20, 25]));
 
                 $entityManager->persist($lockerBay);
                 $entityManager->flush();
@@ -270,7 +272,18 @@ class AppFixtures extends Fixture
                             ->setLocker($locker)
                             ->setStartsAt($startsAt)
                             ->setEndsAt($endsAt)
-                            ->setStatus($reservationStatus);
+                            ->setStatus($reservationStatus)
+                            ->setCurrency('eur')
+                            ->setPlannedAmountCents($this->computePlannedAmountCents((int) $locker->getPriceCents(), $startsAt, $endsAt));
+
+                        $paymentStatus = $this->mapPaymentStatusFromReservationStatus($reservationStatus);
+                        $reservation->setPaymentStatus($paymentStatus);
+
+                        if ($paymentStatus !== 'unpaid') {
+                            $reservation->setPaymentIntentId(sprintf('pi_fixture_%02d_%02d_%03d_%02d', $index + 1, $bayIndex, $lockerNumber, $r + 1));
+                        }
+
+                        $this->hydrateOvertimeFixtureData($reservation, $locker, $reservationStatus, $faker);
 
                         $entityManager->persist($reservation);
 

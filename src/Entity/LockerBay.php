@@ -55,6 +55,10 @@ class LockerBay
     #[Groups(['locker_bay:read'])]
     private ?int $minDuration = null;
 
+    #[ORM\Column(options: ['default' => 0])]
+    #[Groups(['locker_bay:read'])]
+    private int $overtimeSurchargePercent = 0;
+
     #[ORM\Column]
     #[Groups(['locker_bay:read'])]
     private ?\DateTimeImmutable $createdAt = null;
@@ -180,6 +184,18 @@ class LockerBay
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function getOvertimeSurchargePercent(): int
+    {
+        return $this->overtimeSurchargePercent;
+    }
+
+    public function setOvertimeSurchargePercent(int $overtimeSurchargePercent): static
+    {
+        $this->overtimeSurchargePercent = max(0, $overtimeSurchargePercent);
+
+        return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeImmutable

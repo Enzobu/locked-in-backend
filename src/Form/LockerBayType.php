@@ -30,6 +30,15 @@ class LockerBayType extends AbstractType
             ->add('maxDuration', IntegerType::class, [
                 'required' => false,
                 'attr' => ['class' => 'form-control'],
+            ])
+            ->add('overtimeSurchargePercent', IntegerType::class, [
+                'required' => true,
+                'empty_data' => '0',
+                'attr' => [
+                    'class' => 'form-control',
+                    'min' => 0,
+                ],
+                'label' => 'Majoration dépassement (%)',
             ]);
     }
 
