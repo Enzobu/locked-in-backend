@@ -50,10 +50,29 @@ class AppFixtures extends Fixture
         $faker = $fakerFactoryClass::create('fr_FR');
         $faker->seed(20260303);
 
-        $specificationIds = $this->createSpecifications($manager);
-        [$companyIds, $customerIds] = $this->createCompaniesUsersCustomers($manager, $faker);
+        $profile = $this->resolveFixturesProfile();
 
-        $this->createParksAndReservations($manager, $faker, $companyIds, $customerIds, $specificationIds);
+        $specificationIds = $this->createSpecifications($manager);
+        [$companyIds, $customerIds] = $this->createCompaniesUsersCustomers(
+            $manager,
+            $faker,
+            $profile['companyCount'],
+            $profile['customerCount'],
+        );
+
+        $this->createParksAndReservations(
+            $manager,
+            $faker,
+            $companyIds,
+            $customerIds,
+            $specificationIds,
+            $profile['minBayCount'],
+            $profile['maxBayCount'],
+            $profile['minLockerCount'],
+            $profile['maxLockerCount'],
+            $profile['minReservationCount'],
+            $profile['maxReservationCount'],
+        );
     }
 
     /**
@@ -91,12 +110,12 @@ class AppFixtures extends Fixture
     /**
      * @return array{0: int[], 1: int[]}
      */
-    private function createCompaniesUsersCustomers(ObjectManager $manager, object $faker): array
+    private function createCompaniesUsersCustomers(ObjectManager $manager, object $faker, int $companyCount, int $customerCount): array
     {
         $companies = [];
         $customers = [];
 
-        for ($i = 1; $i <= 20; ++$i) {
+        for ($i = 1; $i <= $companyCount; ++$i) {
             $city = self::CITIES[($i - 1) % count(self::CITIES)]['name'];
 
             $address = (new Address())
@@ -139,7 +158,7 @@ class AppFixtures extends Fixture
         $superAdmin->setPassword($this->passwordHasher->hashPassword($superAdmin, 'password'));
         $manager->persist($superAdmin);
 
-        for ($i = 1; $i <= 10; ++$i) {
+        for ($i = 1; $i <= $customerCount; ++$i) {
             $city = self::CITIES[array_rand(self::CITIES)]['name'];
 
             $customerAddress = (new Address())
@@ -178,8 +197,19 @@ class AppFixtures extends Fixture
      * @param int[] $customerIds
      * @param int[] $specificationIds
      */
-    private function createParksAndReservations(ObjectManager $manager, object $faker, array $companyIds, array $customerIds, array $specificationIds): void
-    {
+    private function createParksAndReservations(
+        ObjectManager $manager,
+        object $faker,
+        array $companyIds,
+        array $customerIds,
+        array $specificationIds,
+        int $minBayCount,
+        int $maxBayCount,
+        int $minLockerCount,
+        int $maxLockerCount,
+        int $minReservationCount,
+        int $maxReservationCount,
+    ): void {
         if (!$manager instanceof EntityManagerInterface) {
             throw new \RuntimeException('EntityManagerInterface is required to load fixtures.');
         }
@@ -190,7 +220,7 @@ class AppFixtures extends Fixture
         foreach ($companyIds as $index => $companyId) {
             $city = self::CITIES[$index % count(self::CITIES)];
 
-            $bayCount = $faker->numberBetween(3, 6);
+            $bayCount = $faker->numberBetween($minBayCount, $maxBayCount);
             for ($bayIndex = 1; $bayIndex <= $bayCount; ++$bayIndex) {
                 /** @var Company $company */
                 $company = $entityManager->getReference(Company::class, $companyId);
@@ -209,7 +239,7 @@ class AppFixtures extends Fixture
 
                 $lockerBayId = (int) $lockerBay->getId();
 
-                $lockerCount = $faker->numberBetween(10, 30);
+                $lockerCount = $faker->numberBetween($minLockerCount, $maxLockerCount);
                 for ($lockerNumber = 1; $lockerNumber <= $lockerCount; ++$lockerNumber) {
                     $status = $this->randomLockerStatus($faker);
                     $specificationId = $specificationIds[array_rand($specificationIds)];
@@ -229,7 +259,7 @@ class AppFixtures extends Fixture
 
                     $entityManager->persist($locker);
 
-                    $reservationCount = $faker->numberBetween(1, 20);
+                    $reservationCount = $faker->numberBetween($minReservationCount, $maxReservationCount);
                     for ($r = 0; $r < $reservationCount; ++$r) {
                         $customerId = $customerIds[array_rand($customerIds)];
                         /** @var Customer $customer */
@@ -355,64 +385,51 @@ class AppFixtures extends Fixture
         return [$startsAt, $endsAt, ReservationStatus::ACTIVE];
     }
 
-    private function computePlannedAmountCents(int $priceCentsPerHour, \DateTimeImmutable $startsAt, \DateTimeImmutable $endsAt): int
+    /**
+     * @return array{
+     *     mode:string,
+     *     companyCount:int,
+     *     customerCount:int,
+     *     minBayCount:int,
+     *     maxBayCount:int,
+     *     minLockerCount:int,
+     *     maxLockerCount:int,
+     *     minReservationCount:int,
+     *     maxReservationCount:int
+     * }
+     */
+    private function resolveFixturesProfile(): array
     {
-        $durationMinutes = max(1, (int) ceil(($endsAt->getTimestamp() - $startsAt->getTimestamp()) / 60));
-
-        return (int) ceil(($durationMinutes * max(0, $priceCentsPerHour)) / 60);
-    }
-
-    private function mapPaymentStatusFromReservationStatus(ReservationStatus $reservationStatus): string
-    {
-        return match ($reservationStatus) {
-            ReservationStatus::PENDING => 'requires_payment_method',
-            ReservationStatus::CONFIRMED, ReservationStatus::ACTIVE, ReservationStatus::COMPLETED => 'succeeded',
-            ReservationStatus::CANCELLED => 'canceled',
-            ReservationStatus::EXPIRED => 'payment_failed',
-        };
-    }
-
-    private function hydrateOvertimeFixtureData(Reservation $reservation, Locker $locker, ReservationStatus $reservationStatus, object $faker): void
-    {
-        if ($reservationStatus !== ReservationStatus::COMPLETED) {
-            return;
+        $modeRaw = $_SERVER['FIXTURES_MODE'] ?? $_ENV['FIXTURES_MODE'] ?? getenv('FIXTURES_MODE');
+        $mode = is_string($modeRaw) ? strtolower(trim($modeRaw)) : '';
+        if (!in_array($mode, ['full', 'light'], true)) {
+            $mode = 'light';
         }
 
-        $reservation->setActualEndsAt($reservation->getEndsAt());
-
-        if (!$faker->boolean(35)) {
-            return;
+        if ($mode === 'light') {
+            return [
+                'mode' => 'light',
+                'companyCount' => 2,
+                'customerCount' => 2,
+                'minBayCount' => 2,
+                'maxBayCount' => 2,
+                'minLockerCount' => 3,
+                'maxLockerCount' => 4,
+                'minReservationCount' => 0,
+                'maxReservationCount' => 4,
+            ];
         }
 
-        $overtimeMinutes = $faker->numberBetween(6, 120);
-        $actualEndsAt = $reservation->getEndsAt()?->modify(sprintf('+%d minutes', $overtimeMinutes));
-
-        if (!$actualEndsAt instanceof \DateTimeImmutable) {
-            return;
-        }
-
-        $billableMinutes = max(0, $overtimeMinutes - 5);
-        if ($billableMinutes === 0) {
-            $reservation
-                ->setActualEndsAt($actualEndsAt)
-                ->setOvertimeMinutes($overtimeMinutes)
-                ->setOvertimeAmountCents(0)
-                ->setOvertimePaymentStatus('none');
-
-            return;
-        }
-
-        $steps = (int) ceil($billableMinutes / 15);
-        $stepPriceCents = (int) ceil(max(0, (int) $locker->getPriceCents()) / 4);
-        $baseOvertimeAmountCents = $steps * $stepPriceCents;
-        $surchargePercent = max(0, (int) ($locker->getLockerBay()?->getOvertimeSurchargePercent() ?? 0));
-        $overtimeAmountCents = (int) ceil($baseOvertimeAmountCents * (100 + $surchargePercent) / 100);
-
-        $reservation
-            ->setActualEndsAt($actualEndsAt)
-            ->setOvertimeMinutes($overtimeMinutes)
-            ->setOvertimeAmountCents($overtimeAmountCents)
-            ->setOvertimePaymentIntentId(sprintf('pi_over_fixture_%d', $faker->numberBetween(100000, 999999)))
-            ->setOvertimePaymentStatus($faker->boolean(85) ? 'succeeded' : 'failed');
+        return [
+            'mode' => 'full',
+            'companyCount' => 20,
+            'customerCount' => 10,
+            'minBayCount' => 3,
+            'maxBayCount' => 6,
+            'minLockerCount' => 10,
+            'maxLockerCount' => 30,
+            'minReservationCount' => 1,
+            'maxReservationCount' => 20,
+        ];
     }
 }
