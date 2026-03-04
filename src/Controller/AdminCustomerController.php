@@ -40,7 +40,7 @@ class AdminCustomerController extends AbstractController
 
         if ($form->isSubmitted() && $customer->getAddresses()->isEmpty()) {
             $form->get('addresses')->addError(new FormError('Au moins une adresse est requise.'));
-            $this->addFlash('danger', 'Veuillez saisir au moins une adresse');
+            $this->addFlash('danger', 'Veuillez saisir au moins une adresse.');
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -51,7 +51,7 @@ class AdminCustomerController extends AbstractController
             $entityManager->persist($customer);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Client cree avec succes.');
+            $this->addFlash('success', 'Client créé avec succès.');
 
             return $this->redirectToRoute('app_admin_customers_index');
         }
@@ -75,7 +75,7 @@ class AdminCustomerController extends AbstractController
 
         if ($form->isSubmitted() && $customer->getAddresses()->isEmpty()) {
             $form->get('addresses')->addError(new FormError('Au moins une adresse est requise.'));
-            $this->addFlash('danger', 'Veuillez saisir au moins une adresse');
+            $this->addFlash('danger', 'Veuillez saisir au moins une adresse.');
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -87,7 +87,7 @@ class AdminCustomerController extends AbstractController
             $customer->setRoles(['ROLE_CUSTOMER']);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Client mis a jour.');
+            $this->addFlash('success', 'Client mis à jour.');
 
             return $this->redirectToRoute('app_admin_customers_index');
         }
@@ -103,7 +103,7 @@ class AdminCustomerController extends AbstractController
     public function delete(Customer $customer, Request $request, EntityManagerInterface $entityManager): Response
     {
         if (!$this->isCsrfTokenValid('delete_customer_'.$customer->getId(), (string) $request->request->get('_token'))) {
-            $this->addFlash('danger', 'Token CSRF invalide.');
+            $this->addFlash('danger', 'Jeton CSRF invalide.');
 
             return $this->redirectToRoute('app_admin_customers_index');
         }
@@ -111,7 +111,7 @@ class AdminCustomerController extends AbstractController
         $customer->softDelete();
         $entityManager->flush();
 
-        $this->addFlash('success', 'Client desactive.');
+        $this->addFlash('success', 'Client désactivé.');
 
         return $this->redirectToRoute('app_admin_customers_index');
     }
@@ -120,7 +120,7 @@ class AdminCustomerController extends AbstractController
     public function restore(Customer $customer, Request $request, EntityManagerInterface $entityManager): Response
     {
         if (!$this->isCsrfTokenValid('restore_customer_'.$customer->getId(), (string) $request->request->get('_token'))) {
-            $this->addFlash('danger', 'Token CSRF invalide.');
+            $this->addFlash('danger', 'Jeton CSRF invalide.');
 
             return $this->redirectToRoute('app_admin_customers_index', ['deleted' => 1]);
         }
@@ -128,7 +128,7 @@ class AdminCustomerController extends AbstractController
         $customer->restore();
         $entityManager->flush();
 
-        $this->addFlash('success', 'Client restaure.');
+        $this->addFlash('success', 'Client restauré.');
 
         return $this->redirectToRoute('app_admin_customers_index', ['deleted' => 1]);
     }

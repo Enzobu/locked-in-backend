@@ -7,7 +7,7 @@
     <section class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-4">
         <div>
             <h2 class="h3 mb-1">Tableau de bord</h2>
-            <p class="text-body-secondary mb-0">Vue d'ensemble du parc de casiers et des activites en cours.</p>
+            <p class="text-body-secondary mb-0">Vue d'ensemble du parc de casiers et des activités en cours.</p>
         </div>
         <a href="/api" class="btn btn-outline-primary" target="_blank" rel="noreferrer">Ouvrir API Docs</a>
     </section>
@@ -16,9 +16,9 @@
         <div class="col-12 col-md-6 col-xl-3">
             <article class="card shadow-sm h-100 dashboard-kpi">
                 <div class="card-body">
-                    <p class="text-body-secondary mb-1">Casiers total</p>
+                    <p class="text-body-secondary mb-1">Casiers totaux</p>
                     <p class="display-6 fw-semibold mb-2">{{ totalLockers }}</p>
-                    <p class="small mb-0">{{ availableLockers }} disponibles, {{ occupiedLockers }} occupes</p>
+                    <p class="small mb-0">{{ availableLockers }} disponibles, {{ occupiedLockers }} occupés</p>
                 </div>
             </article>
         </div>
@@ -27,16 +27,16 @@
                 <div class="card-body">
                     <p class="text-body-secondary mb-1">Occupation</p>
                     <p class="display-6 fw-semibold mb-2">{{ occupancyRate }}%</p>
-                    <p class="small mb-0">{{ reservedLockers }} reserves en attente</p>
+                    <p class="small mb-0">{{ reservedLockers }} réservés en attente</p>
                 </div>
             </article>
         </div>
         <div class="col-12 col-md-6 col-xl-3">
             <article class="card shadow-sm h-100 dashboard-kpi">
                 <div class="card-body">
-                    <p class="text-body-secondary mb-1">Reservations</p>
+                    <p class="text-body-secondary mb-1">Réservations</p>
                     <p class="display-6 fw-semibold mb-2">{{ totalReservations }}</p>
-                    <p class="small mb-0">{{ activeReservations }} actives, {{ confirmedReservations }} confirmees</p>
+                    <p class="small mb-0">{{ activeReservations }} actives, {{ confirmedReservations }} confirmées</p>
                 </div>
             </article>
         </div>
@@ -55,18 +55,18 @@
         <div class="col-12 col-xl-7">
             <article class="card shadow-sm h-100">
                 <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                    <h3 class="h6 mb-0">Reservations a venir</h3>
+                    <h3 class="h6 mb-0">Réservations à venir</h3>
                     {{ label.default(upcomingReservations|length) }}
                 </div>
                 <div class="card-body p-0">
                     {% if upcomingReservations is empty %}
-                        <p class="text-body-secondary p-3 mb-0">Aucune reservation a venir.</p>
+                        <p class="text-body-secondary p-3 mb-0">Aucune réservation à venir.</p>
                     {% else %}
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0 table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Debut</th>
+                                        <th>Début</th>
                                         <th>Client</th>
                                         <th>Casier</th>
                                         <th>Statut</th>
@@ -81,17 +81,17 @@
                                             <td>
                                                 {% set status = reservation.status.value %}
                                                 {% if status == 'active' %}
-                                                    {{ label.default('active', 'success') }}
+                                                    {{ label.default('Active', 'success') }}
                                                 {% elseif status == 'confirmed' %}
-                                                    {{ label.default('confirmee') }}
+                                                    {{ label.default('Confirmée') }}
                                                 {% elseif status == 'pending' %}
-                                                    {{ label.default('en attente', 'warning') }}
+                                                    {{ label.default('En attente', 'warning') }}
                                                 {% elseif status == 'completed' %}
-                                                    {{ label.default('terminee', 'secondary') }}
+                                                    {{ label.default('Terminée', 'secondary') }}
                                                 {% elseif status == 'cancelled' %}
-                                                    {{ label.default('annulee', 'danger') }}
+                                                    {{ label.default('Annulée', 'danger') }}
                                                 {% elseif status == 'expired' %}
-                                                    {{ label.default('expiree', 'dark') }}
+                                                    {{ label.default('Expirée', 'dark') }}
                                                 {% else %}
                                                     {{ label.default(status, 'secondary') }}
                                                 {% endif %}
@@ -114,7 +114,7 @@
                 </div>
                 <div class="card-body p-0">
                     {% if lockerAlerts is empty %}
-                        <p class="text-body-secondary p-3 mb-0">Aucune alerte critique detectee.</p>
+                        <p class="text-body-secondary p-3 mb-0">Aucune alerte critique détectée.</p>
                     {% else %}
                         <ul class="list-group list-group-flush">
                             {% for locker in lockerAlerts %}
@@ -124,9 +124,9 @@
                                         <p class="text-body-secondary small mb-0">Maj: {{ locker.updatedAt|date('d/m H:i') }}</p>
                                     </div>
                                     {% if locker.status.value == 'offline' %}
-                                        {{ label.default('offline', 'danger') }}
+                                        {{ label.default('Offline', 'danger') }}
                                     {% else %}
-                                        {{ label.default('out_of_order', 'warning') }}
+                                        {{ label.default('Hors service', 'warning') }}
                                     {% endif %}
                                 </li>
                             {% endfor %}
@@ -141,12 +141,12 @@
         <div class="col-12 col-lg-6">
             <article class="card shadow-sm h-100">
                 <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                    <h3 class="h6 mb-0">Actions recentes</h3>
+                    <h3 class="h6 mb-0">Actions récentes</h3>
                     {{ label.default(recentActions|length, 'secondary') }}
                 </div>
                 <div class="card-body p-0">
                     {% if recentActions is empty %}
-                        <p class="text-body-secondary p-3 mb-0">Aucune action recente.</p>
+                        <p class="text-body-secondary p-3 mb-0">Aucune action récente.</p>
                     {% else %}
                         <ul class="list-group list-group-flush">
                             {% for action in recentActions %}
@@ -155,13 +155,13 @@
                                         <p class="mb-0 fw-semibold">{{ action.type }} - casier #{{ action.locker.number }}</p>
                                         {% set actionStatus = action.status.value %}
                                         {% if actionStatus == 'success' %}
-                                            {{ label.default('success', 'success') }}
+                                            {{ label.default('Success', 'success') }}
                                         {% elseif actionStatus == 'failed' %}
-                                            {{ label.default('failed', 'danger') }}
+                                            {{ label.default('Failed', 'danger') }}
                                         {% elseif actionStatus == 'sent' %}
-                                            {{ label.default('sent') }}
+                                            {{ label.default('Sent') }}
                                         {% elseif actionStatus == 'pending' %}
-                                            {{ label.default('pending', 'warning') }}
+                                            {{ label.default('Pending', 'warning') }}
                                         {% else %}
                                             {{ label.default(actionStatus, 'secondary') }}
                                         {% endif %}
@@ -178,12 +178,12 @@
         <div class="col-12 col-lg-6">
             <article class="card shadow-sm h-100">
                 <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                    <h3 class="h6 mb-0">Evenements recents</h3>
+                    <h3 class="h6 mb-0">Événements récents</h3>
                     {{ label.default(recentEvents|length, 'secondary') }}
                 </div>
                 <div class="card-body p-0">
                     {% if recentEvents is empty %}
-                        <p class="text-body-secondary p-3 mb-0">Aucun evenement recent.</p>
+                        <p class="text-body-secondary p-3 mb-0">Aucun événement récent.</p>
                     {% else %}
                         <ul class="list-group list-group-flush">
                             {% for event in recentEvents %}

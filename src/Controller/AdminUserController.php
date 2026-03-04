@@ -42,7 +42,7 @@ class AdminUserController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Utilisateur backoffice cree avec succes.');
+            $this->addFlash('success', 'Utilisateur backoffice créé avec succès.');
 
             return $this->redirectToRoute('app_admin_users_index');
         }
@@ -68,7 +68,7 @@ class AdminUserController extends AbstractController
 
             $entityManager->flush();
 
-            $this->addFlash('success', 'Utilisateur backoffice mis a jour.');
+            $this->addFlash('success', 'Utilisateur backoffice mis à jour.');
 
             return $this->redirectToRoute('app_admin_users_index');
         }
@@ -84,7 +84,7 @@ class AdminUserController extends AbstractController
     public function delete(User $user, Request $request, EntityManagerInterface $entityManager): Response
     {
         if (!$this->isCsrfTokenValid('delete_user_'.$user->getId(), (string) $request->request->get('_token'))) {
-            $this->addFlash('danger', 'Token CSRF invalide.');
+            $this->addFlash('danger', 'Jeton CSRF invalide.');
 
             return $this->redirectToRoute('app_admin_users_index');
         }
@@ -99,7 +99,7 @@ class AdminUserController extends AbstractController
         $user->softDelete();
         $entityManager->flush();
 
-        $this->addFlash('success', 'Utilisateur desactive.');
+        $this->addFlash('success', 'Utilisateur désactivé.');
 
         return $this->redirectToRoute('app_admin_users_index');
     }
@@ -108,7 +108,7 @@ class AdminUserController extends AbstractController
     public function restore(User $user, Request $request, EntityManagerInterface $entityManager): Response
     {
         if (!$this->isCsrfTokenValid('restore_user_'.$user->getId(), (string) $request->request->get('_token'))) {
-            $this->addFlash('danger', 'Token CSRF invalide.');
+            $this->addFlash('danger', 'Jeton CSRF invalide.');
 
             return $this->redirectToRoute('app_admin_users_index', ['deleted' => 1]);
         }
@@ -116,7 +116,7 @@ class AdminUserController extends AbstractController
         $user->restore();
         $entityManager->flush();
 
-        $this->addFlash('success', 'Utilisateur restaure.');
+        $this->addFlash('success', 'Utilisateur restauré.');
 
         return $this->redirectToRoute('app_admin_users_index', ['deleted' => 1]);
     }

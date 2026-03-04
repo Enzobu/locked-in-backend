@@ -63,14 +63,14 @@ class AdminCompanyController extends AbstractController
             $entityManager->persist($company);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Societe creee.');
+            $this->addFlash('success', 'Société créée.');
 
             return $this->redirectToRoute('app_admin_companies_show', ['id' => $company->getId()]);
         }
 
         return $this->render('admin/companies/form.html.twig', [
             'form' => $form,
-            'title' => 'Nouvelle societe',
+            'title' => 'Nouvelle société',
             'submitLabel' => 'Creer',
         ]);
     }
@@ -104,14 +104,14 @@ class AdminCompanyController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            $this->addFlash('success', 'Societe mise a jour.');
+            $this->addFlash('success', 'Société mise à jour.');
 
             return $this->redirectToRoute('app_admin_companies_show', ['id' => $company->getId()]);
         }
 
         return $this->render('admin/companies/form.html.twig', [
             'form' => $form,
-            'title' => 'Modifier societe',
+            'title' => 'Modifier société',
             'submitLabel' => 'Enregistrer',
         ]);
     }
@@ -122,19 +122,19 @@ class AdminCompanyController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         if (!$this->isCsrfTokenValid('delete_company_'.$company->getId(), (string) $request->request->get('_token'))) {
-            $this->addFlash('danger', 'Token CSRF invalide.');
+            $this->addFlash('danger', 'Jeton CSRF invalide.');
 
             return $this->redirectToRoute('app_admin_companies_index');
         }
 
         if (!$company->getUsers()->isEmpty()) {
-            $this->addFlash('danger', 'Impossible de supprimer: la societe possede encore des utilisateurs backoffice.');
+            $this->addFlash('danger', 'Impossible de supprimer : la société possède encore des utilisateurs backoffice.');
 
             return $this->redirectToRoute('app_admin_companies_show', ['id' => $company->getId()]);
         }
 
         if (!$company->getLockerBays()->isEmpty()) {
-            $this->addFlash('danger', 'Impossible de supprimer: supprimez d abord les baies de casiers.');
+            $this->addFlash('danger', 'Impossible de supprimer : supprimez d\'abord les baies de casiers.');
 
             return $this->redirectToRoute('app_admin_companies_show', ['id' => $company->getId()]);
         }
@@ -142,7 +142,7 @@ class AdminCompanyController extends AbstractController
         $entityManager->remove($company);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Societe supprimee.');
+        $this->addFlash('success', 'Société supprimée.');
 
         return $this->redirectToRoute('app_admin_companies_index');
     }
@@ -162,7 +162,7 @@ class AdminCompanyController extends AbstractController
             $entityManager->persist($lockerBay);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Baie creee.');
+            $this->addFlash('success', 'Baie créée.');
 
             return $this->redirectToRoute('app_admin_companies_show', ['id' => $company->getId()]);
         }
@@ -186,7 +186,7 @@ class AdminCompanyController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            $this->addFlash('success', 'Baie mise a jour.');
+            $this->addFlash('success', 'Baie mise à jour.');
 
             return $this->redirectToRoute('app_admin_companies_show', ['id' => $lockerBay->getCompany()?->getId()]);
         }
@@ -205,13 +205,13 @@ class AdminCompanyController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         if (!$this->isCsrfTokenValid('delete_bay_'.$lockerBay->getId(), (string) $request->request->get('_token'))) {
-            $this->addFlash('danger', 'Token CSRF invalide.');
+            $this->addFlash('danger', 'Jeton CSRF invalide.');
 
             return $this->redirectToRoute('app_admin_companies_show', ['id' => $lockerBay->getCompany()?->getId()]);
         }
 
         if (!$lockerBay->getLockers()->isEmpty()) {
-            $this->addFlash('danger', 'Impossible de supprimer la baie: retirez d abord ses casiers.');
+            $this->addFlash('danger', 'Impossible de supprimer la baie : retirez d\'abord ses casiers.');
 
             return $this->redirectToRoute('app_admin_companies_show', ['id' => $lockerBay->getCompany()?->getId()]);
         }
@@ -220,7 +220,7 @@ class AdminCompanyController extends AbstractController
         $entityManager->remove($lockerBay);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Baie supprimee.');
+        $this->addFlash('success', 'Baie supprimée.');
 
         return $this->redirectToRoute('app_admin_companies_show', ['id' => $companyId]);
     }
@@ -243,7 +243,7 @@ class AdminCompanyController extends AbstractController
                 $entityManager->persist($locker);
                 $entityManager->flush();
 
-                $this->addFlash('success', 'Casier cree.');
+                $this->addFlash('success', 'Casier créé.');
 
                 return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $lockerBay->getId()]);
             }
@@ -268,7 +268,7 @@ class AdminCompanyController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            $this->addFlash('success', 'Casier mis a jour.');
+            $this->addFlash('success', 'Casier mis à jour.');
 
             return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $locker->getLockerBay()?->getId()]);
         }
@@ -287,13 +287,13 @@ class AdminCompanyController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         if (!$this->isCsrfTokenValid('delete_locker_'.$locker->getId(), (string) $request->request->get('_token'))) {
-            $this->addFlash('danger', 'Token CSRF invalide.');
+            $this->addFlash('danger', 'Jeton CSRF invalide.');
 
             return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $locker->getLockerBay()?->getId()]);
         }
 
         if (!$locker->getReservations()->isEmpty()) {
-            $this->addFlash('danger', 'Impossible de supprimer ce casier: des reservations existent.');
+            $this->addFlash('danger', 'Impossible de supprimer ce casier : des réservations existent.');
 
             return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $locker->getLockerBay()?->getId()]);
         }
@@ -302,7 +302,7 @@ class AdminCompanyController extends AbstractController
         $entityManager->remove($locker);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Casier supprime.');
+        $this->addFlash('success', 'Casier supprimé.');
 
         return $this->redirectToRoute('app_admin_locker_bays_show', ['id' => $bayId]);
     }

@@ -20,7 +20,7 @@
         </div>
         <div class="col-auto">
             <a class="btn btn-outline-secondary" href="{{ path('app_admin_customers_index', {'deleted': showDeleted ? 0 : 1}) }}">
-                {{ showDeleted ? 'Voir actifs' : 'Voir supprimes' }}
+                {{ showDeleted ? 'Voir actifs' : 'Voir supprimés' }}
             </a>
         </div>
     </form>
@@ -28,7 +28,7 @@
     <article class="card shadow-sm">
         <div class="card-body p-0">
             {% if customers is empty %}
-                <p class="p-3 text-body-secondary mb-0">Aucun client trouve.</p>
+                <p class="p-3 text-body-secondary mb-0">Aucun client trouvé.</p>
             {% else %}
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
@@ -36,9 +36,9 @@
                             <tr>
                                 <th>Nom</th>
                                 <th>Email</th>
-                                <th>Date naissance</th>
+                                <th>Date de naissance</th>
                                 <th>Adresse</th>
-                                <th>Cree le</th>
+                                <th>Créé le</th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>
@@ -65,9 +65,9 @@
                                             </form>
                                         {% else %}
                                             <a class="btn btn-sm btn-outline-primary" href="{{ path('app_admin_customers_edit', {'id': customer.id}) }}">Modifier</a>
-                                            <form method="post" action="{{ path('app_admin_customers_delete', {'id': customer.id}) }}" class="d-inline" onsubmit="return confirm('Desactiver ce client ?');">
+                                            <form method="post" action="{{ path('app_admin_customers_delete', {'id': customer.id}) }}" class="d-inline" onsubmit="return confirm('Désactiver ce client ?');">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('delete_customer_' ~ customer.id) }}">
-                                                <button class="btn btn-sm btn-outline-danger" type="submit">Desactiver</button>
+                                                <button class="btn btn-sm btn-outline-danger" type="submit">Désactiver</button>
                                             </form>
                                         {% endif %}
                                     </td>

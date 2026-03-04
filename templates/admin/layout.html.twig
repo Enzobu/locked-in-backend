@@ -16,9 +16,9 @@
                 </nav>
 
                 <div class="admin-sidebar-footer border-top">
-                    <p class="small text-body-secondary mb-1">Connecte en tant que</p>
+                    <p class="small text-body-secondary mb-1">Connecté en tant que</p>
                     <p class="fw-semibold mb-3 text-truncate">{{ app.user ? app.user.userIdentifier : 'Utilisateur' }}</p>
-                    <a href="{{ path('app_admin_logout') }}" class="btn btn-outline-danger w-100 btn-sm">Se deconnecter</a>
+                    <a href="{{ path('app_admin_logout') }}" class="btn btn-outline-danger w-100 btn-sm">Se déconnecter</a>
                 </div>
             </aside>
 
@@ -37,7 +37,7 @@
 
                         <div class="d-flex align-items-center gap-2">
                             {% block admin_topbar_actions %}{% endblock %}
-                            <a href="{{ path('app_admin_logout') }}" class="btn btn-outline-danger btn-sm d-lg-none">Se deconnecter</a>
+                            <a href="{{ path('app_admin_logout') }}" class="btn btn-outline-danger btn-sm d-lg-none">Se déconnecter</a>
                         </div>
                     </div>
                 </header>
@@ -80,7 +80,7 @@
     {% elseif route starts with 'app_admin_locker_bays' or route starts with 'app_admin_lockers' %}
         Casiers
     {% elseif route starts with 'app_admin_companies' %}
-        Societes
+        Sociétés
     {% elseif route starts with 'app_admin_users' %}
         Utilisateurs BO
     {% elseif route starts with 'app_admin_customers' %}

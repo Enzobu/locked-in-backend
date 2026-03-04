@@ -2,7 +2,7 @@
 {% import 'macros/badge.html.twig' as label %}
 {% import 'macros/modal.html.twig' as modal %}
 
-{% block title %}Baie {{ bay.name }}{% endblock %}
+    {% block title %}Baie {{ bay.name }}{% endblock %}
 
 {% block admin_content %}
     {% set total = bay.lockers|length %}
@@ -29,7 +29,7 @@
         <div class="d-flex gap-2">
             <span class="badge text-bg-secondary" style="margin-top: auto; margin-bottom: auto;">{{ lockers|length ~ ' casier(s) affiches' }}</span>
             {% if not is_granted('ROLE_ADMIN') %}
-                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#durationsModal">Modifier durees</button>
+            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#durationsModal">Modifier durées</button>
             {% endif %}
             {% if is_granted('ROLE_ADMIN') %}
                 <a class="btn btn-outline-primary" href="{{ path('app_admin_companies_locker_bays_edit', {id: bay.id}) }}">Modifier baie</a>
@@ -41,12 +41,12 @@
     <section class="row g-3 mb-4">
         <div class="col-12 col-xl-4">
             <article class="card shadow-sm h-100">
-                <div class="card-header bg-transparent"><h3 class="h6 mb-0">Caracteristiques baie</h3></div>
+                <div class="card-header bg-transparent"><h3 class="h6 mb-0">Caractéristiques baie</h3></div>
                 <div class="card-body small">
-                    <p class="mb-2"><strong>Coordonnees:</strong> {{ bay.latitude }}, {{ bay.longitude }}</p>
-                    <p class="mb-2"><strong>Duree min:</strong> {{ bay.minDuration ?? '-' }} min</p>
-                    <p class="mb-2"><strong>Duree max:</strong> {{ bay.maxDuration ?? '-' }} min</p>
-                    <p class="mb-0"><strong>Mise a jour:</strong> {{ bay.updatedAt|date('d/m/Y H:i') }}</p>
+                    <p class="mb-2"><strong>Coordonnées:</strong> {{ bay.latitude }}, {{ bay.longitude }}</p>
+                    <p class="mb-2"><strong>Durée min:</strong> {{ bay.minDuration ?? '-' }} min</p>
+                    <p class="mb-2"><strong>Durée max:</strong> {{ bay.maxDuration ?? '-' }} min</p>
+                    <p class="mb-0"><strong>Mise à jour:</strong> {{ bay.updatedAt|date('d/m/Y H:i') }}</p>
                 </div>
             </article>
         </div>
@@ -75,8 +75,8 @@
             <select name="status" class="form-select">
                 <option value="all" {{ statusFilter == 'all' ? 'selected' : '' }}>Tous statuts</option>
                 <option value="available" {{ statusFilter == 'available' ? 'selected' : '' }}>Disponible</option>
-                <option value="reserved" {{ statusFilter == 'reserved' ? 'selected' : '' }}>Reserve</option>
-                <option value="occupied" {{ statusFilter == 'occupied' ? 'selected' : '' }}>Occupe</option>
+                <option value="reserved" {{ statusFilter == 'reserved' ? 'selected' : '' }}>Réservé</option>
+                <option value="occupied" {{ statusFilter == 'occupied' ? 'selected' : '' }}>Occupé</option>
                 <option value="offline" {{ statusFilter == 'offline' ? 'selected' : '' }}>Offline</option>
                 <option value="out_of_order" {{ statusFilter == 'out_of_order' ? 'selected' : '' }}>Hors service</option>
             </select>
@@ -97,11 +97,11 @@
                             {% if status == 'available' %}
                                 {{ label.default('Disponible', 'success') }}
                             {% elseif status == 'reserved' %}
-                                {{ label.default('Reserve') }}
+                                {{ label.default('Réservé') }}
                             {% elseif status == 'occupied' %}
-                                {{ label.default('Occupe', 'warning') }}
+                                {{ label.default('Occupé', 'warning') }}
                             {% elseif status == 'offline' %}
-                                {{ label.default('Offline', 'danger') }}
+                                    {{ label.default('Offline', 'danger') }}
                             {% else %}
                                 {{ label.default('Hors service', 'dark') }}
                             {% endif %}
@@ -137,11 +137,11 @@
             <form id="durationsForm" method="post" action="{{ path('app_admin_locker_bays_update_durations', {id: bay.id}) }}" class="row g-3">
                 <input type="hidden" name="_token" value="{{ csrf_token('update_durations_' ~ bay.id) }}">
                 <div class="col-12 col-md-6">
-                    <label for="minDurationInput" class="form-label">Duree min (minutes)</label>
+                    <label for="minDurationInput" class="form-label">Durée min (minutes)</label>
                     <input id="minDurationInput" type="number" name="minDuration" min="0" class="form-control" value="{{ bay.minDuration }}">
                 </div>
                 <div class="col-12 col-md-6">
-                    <label for="maxDurationInput" class="form-label">Duree max (minutes)</label>
+                    <label for="maxDurationInput" class="form-label">Durée max (minutes)</label>
                     <input id="maxDurationInput" type="number" name="maxDuration" min="0" class="form-control" value="{{ bay.maxDuration }}">
                 </div>
             </form>
@@ -152,7 +152,7 @@
             <button type="submit" class="btn btn-primary" form="durationsForm">Enregistrer</button>
         {% endset %}
 
-        {{ modal.base('durationsModal', 'Modifier les durees de la baie', durationsBody, durationsFooter) }}
+        {{ modal.base('durationsModal', 'Modifier les durées de la baie', durationsBody, durationsFooter) }}
 
         {% for locker in lockers %}
             {% set lockerPriceBody %}

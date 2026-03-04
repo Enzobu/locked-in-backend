@@ -7,7 +7,7 @@
 {% block admin_content %}
     <section class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-4">
         <div>
-            <a class="link-secondary text-decoration-none" href="{{ path('app_admin_locker_bays_show', {id: locker.lockerBay.id}) }}">← Retour a la baie {{ locker.lockerBay.name }}</a>
+            <a class="link-secondary text-decoration-none" href="{{ path('app_admin_locker_bays_show', {id: locker.lockerBay.id}) }}">← Retour à la baie {{ locker.lockerBay.name }}</a>
             <h2 class="h3 mt-2 mb-1">Casier #{{ locker.number }}</h2>
             <p class="text-body-secondary mb-0">{{ locker.lockerBay.name }} - {{ locker.lockerBay.company.name }}</p>
         </div>
@@ -34,9 +34,9 @@
                         {% if locker.status.value == 'available' %}
                             {{ label.default('Disponible', 'success') }}
                         {% elseif locker.status.value == 'reserved' %}
-                            {{ label.default('Reserve') }}
+                            {{ label.default('Réservé') }}
                         {% elseif locker.status.value == 'occupied' %}
-                            {{ label.default('Occupe', 'warning') }}
+                            {{ label.default('Occupé', 'warning') }}
                         {% elseif locker.status.value == 'offline' %}
                             {{ label.default('Offline', 'danger') }}
                         {% else %}
@@ -55,11 +55,11 @@
                 <div class="card-header bg-transparent"><h3 class="h6 mb-0">Mini dashboard</h3></div>
                 <div class="card-body">
                     <div class="row g-2">
-                        <div class="col-6 col-lg-4">{{ label.emphasis(upcomingReservations|length ~ ' a venir', 'primary') }}</div>
+                        <div class="col-6 col-lg-4">{{ label.emphasis(upcomingReservations|length ~ ' à venir', 'primary') }}</div>
                         <div class="col-6 col-lg-4">{{ label.emphasis(currentReservations|length ~ ' en cours', 'success') }}</div>
                         <div class="col-6 col-lg-4">{{ label.emphasis(historyReservations|length ~ ' historiques', 'secondary') }}</div>
                         <div class="col-6 col-lg-4">{{ label.emphasis(recentActions|length ~ ' actions', 'warning') }}</div>
-                        <div class="col-6 col-lg-4">{{ label.emphasis(recentEvents|length ~ ' evenements', 'info') }}</div>
+                        <div class="col-6 col-lg-4">{{ label.emphasis(recentEvents|length ~ ' événements', 'info') }}</div>
                     </div>
                 </div>
             </article>
@@ -70,16 +70,16 @@
         <div class="col-12">
             <article class="card shadow-sm">
                 <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                    <h3 class="h6 mb-0">Reservations a venir</h3>
+                    <h3 class="h6 mb-0">Réservations à venir</h3>
                     {{ label.default(upcomingReservations|length, 'primary') }}
                 </div>
                 <div class="card-body p-0">
                     {% if upcomingReservations is empty %}
-                        <p class="p-3 text-body-secondary mb-0">Aucune reservation a venir.</p>
+                        <p class="p-3 text-body-secondary mb-0">Aucune réservation à venir.</p>
                     {% else %}
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
-                                <thead><tr><th>Debut</th><th>Fin</th><th>Client</th><th>Statut</th></tr></thead>
+                                <thead><tr><th>Début</th><th>Fin</th><th>Client</th><th>Statut</th></tr></thead>
                                 <tbody>
                                     {% for reservation in upcomingReservations %}
                                         <tr>
@@ -102,7 +102,7 @@
         <div class="col-12">
             <article class="card shadow-sm">
                 <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                    <h3 class="h6 mb-0">Reservation(s) en cours</h3>
+                    <h3 class="h6 mb-0">Réservation(s) en cours</h3>
                     {{ label.default(currentReservations|length, 'success') }}
                 </div>
                 <div class="card-body p-0">
@@ -111,7 +111,7 @@
                     {% else %}
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
-                                <thead><tr><th>Debut</th><th>Fin</th><th>Client</th><th>Statut</th></tr></thead>
+                                <thead><tr><th>Début</th><th>Fin</th><th>Client</th><th>Statut</th></tr></thead>
                                 <tbody>
                                     {% for reservation in currentReservations %}
                                         <tr>
@@ -134,16 +134,16 @@
         <div class="col-12">
             <article class="card shadow-sm">
                 <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                    <h3 class="h6 mb-0">Historique des reservations</h3>
+                    <h3 class="h6 mb-0">Historique des réservations</h3>
                     {{ label.default(historyReservations|length, 'secondary') }}
                 </div>
                 <div class="card-body p-0">
                     {% if historyReservations is empty %}
-                        <p class="p-3 text-body-secondary mb-0">Aucun historique de reservation.</p>
+                        <p class="p-3 text-body-secondary mb-0">Aucun historique de réservation.</p>
                     {% else %}
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
-                                <thead><tr><th>Debut</th><th>Fin</th><th>Client</th><th>Statut</th></tr></thead>
+                                <thead><tr><th>Début</th><th>Fin</th><th>Client</th><th>Statut</th></tr></thead>
                                 <tbody>
                                     {% for reservation in historyReservations %}
                                         <tr>
