@@ -156,7 +156,7 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": "{{baseUrl}}{{apiPrefix}}/lockers?lockerBay={{apiPrefix}}/locker_bays/{{lockerBayId}}"
+            "url": "{{baseUrl}}{{apiPrefix}}/lockers?lockerBayId={{lockerBayId}}"
           }
         },
         {
