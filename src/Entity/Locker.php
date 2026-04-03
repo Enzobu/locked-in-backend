@@ -63,6 +63,9 @@ class Locker
     #[Groups(['locker:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $deviceId = null;
+
     /**
      * @var Collection<int, Reservation>
      */
@@ -242,5 +245,17 @@ class Locker
     public function onPreUpdate(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    public function getDeviceId(): ?string
+    {
+        return $this->deviceId;
+    }
+
+    public function setDeviceId(?string $deviceId): self
+    {
+        $this->deviceId = $deviceId;
+
+        return $this;
     }
 }

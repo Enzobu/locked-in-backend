@@ -1,7 +1,6 @@
 name: locked-in
 
 services:
-  ###> doctrine/doctrine-bundle ###
   database:
     image: mariadb:11.8.5-ubi9
     container_name: locked-in-database
@@ -17,7 +16,6 @@ services:
     expose:
       - 3306
     restart: unless-stopped
-  ###< doctrine/doctrine-bundle ###
 
   phpmyadmin:
     image: phpmyadmin:5.2.3
