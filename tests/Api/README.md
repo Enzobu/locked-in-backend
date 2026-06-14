@@ -19,7 +19,20 @@ deterministic state, so locker/reservation IDs are discovered dynamically.
 ## Run
 
 ```bash
-python3 tests/Api/test_reservation_guard.py   # anti double-booking, min/max duration, unbookable lockers
+python3 tests/Api/test_reservation_guard.py        # anti double-booking, min/max duration, unbookable lockers
+python3 tests/Api/test_reservation_lifecycle.py    # cancellation, refund flag, locker freeing, illegal transitions
+python3 tests/Api/test_expiration.py               # app:reservations:expire frees stale holds
+python3 tests/Api/test_webhook.py                  # Stripe webhook: confirm/fail, locker sync, idempotency, signature
+python3 tests/Api/test_payment_idempotency.py      # duplicate /payments/intents reuses the hold
+python3 tests/Api/test_password_change.py          # POST /api/customers/me/password
 ```
 
 Exit code is non-zero if any assertion fails.
+
+## Unit tests (PHPUnit, no stack required)
+
+Pure domain-logic tests run inside the container without a database:
+
+```bash
+docker compose exec apache php vendor/bin/phpunit tests/Unit
+```

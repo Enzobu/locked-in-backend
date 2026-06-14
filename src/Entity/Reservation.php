@@ -14,6 +14,7 @@ use App\Repository\ReservationRepository;
 use App\State\ReservationPatchProcessor;
 use App\State\ReservationPostProcessor;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
 #[ApiResource(operations: [
@@ -32,9 +33,12 @@ class Reservation
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: 'startsAt is required.')]
     private ?\DateTimeImmutable $startsAt = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: 'endsAt is required.')]
+    #[Assert\GreaterThan(propertyPath: 'startsAt', message: 'endsAt must be greater than startsAt.')]
     private ?\DateTimeImmutable $endsAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
@@ -44,6 +48,7 @@ class Reservation
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: 'locker is required.')]
     private ?Locker $locker = null;
 
     #[ORM\Column(length: 50, enumType: ReservationStatus::class)]
