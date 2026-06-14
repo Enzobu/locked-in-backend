@@ -155,6 +155,31 @@ Légende : ✅ fait · ⚠️ partiel/fragile · ❌ absent.
 
 ---
 
+## 7b. Implémenté dans la branche `feature/prod-readiness-business-logic`
+
+Logique métier back livrée (hors CORS/secrets/emails, gardés pour la V2), chaque
+palier avec ses tests :
+
+| Item | Statut | Commit / fichiers clés |
+|------|--------|------------------------|
+| Anti double-booking + verrou + durée min/max + casier HS | ✅ | `ReservationAvailabilityChecker`, `ReservationRepository::findOverlapping`, câblé dans `ReservationPostProcessor` + `/payments/intents` |
+| Annulation propre + remboursement + libération casier | ✅ | `ReservationLifecycleService`, `ReservationPatchProcessor`, colonnes `cancelled_at/refund_id/refund_status` (+ migration) |
+| Statut casier synchronisé (OCCUPIED/RESERVED/AVAILABLE) | ✅ | `LockerStateService` |
+| Expiration auto des holds non payés | ✅ | commande `app:reservations:expire` |
+| Webhook Stripe robuste (confirm/échec, idempotent, signature) | ✅ | `ApiStripePaymentController::webhook` via lifecycle |
+| Idempotence paiement (réutilisation hold + Idempotency-Key) | ✅ | `findReusablePending`, `StripeClient` |
+| Changement de mot de passe | ✅ | `POST /api/customers/me/password` |
+| Validation entité + tests unitaires/intégration | ✅ | contraintes `Assert`, `tests/Unit/*`, `tests/Api/*` |
+
+Tests : **14 tests PHPUnit** (services purs) + **58 assertions d'intégration HTTP**
+(`tests/Api/`, voir `tests/Api/README.md`).
+
+**Reste hors périmètre de cette branche** (volontairement) : restriction CORS,
+secrets de prod, emails + mot de passe oublié (V2), prolongation de réservation
+(#10), filtrage des casiers HS dans le *listing* (la réservation est déjà
+bloquée), step PHPUnit dans la CI. Le chemin de remboursement Stripe est codé
+mais non rejouable en local sans clé `sk_test`.
+
 ## 7. Risques principaux résumés
 
 1. **Double-booking** — défaut métier central, non géré côté back (P0).
