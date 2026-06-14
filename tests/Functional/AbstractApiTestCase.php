@@ -34,6 +34,10 @@ abstract class AbstractApiTestCase extends ApiTestCase
         $this->client->disableReboot();
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
         $this->resetDatabase();
+
+        // Reset rate-limit counters so login/registration throttling state never
+        // leaks between tests.
+        static::getContainer()->get('cache.rate_limiter')->clear();
     }
 
     private function resetDatabase(): void

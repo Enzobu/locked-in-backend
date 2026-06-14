@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 
 class ApiRegisterController extends AbstractController
 {
@@ -21,7 +22,14 @@ class ApiRegisterController extends AbstractController
         UserPasswordHasherInterface $passwordHasher,
         JWTTokenManagerInterface $jwtTokenManager,
         EntityManagerInterface $entityManager,
+        RateLimiterFactoryInterface $registrationLimiter,
     ): JsonResponse {
+        // Throttle registration by client IP to slow down account-creation abuse.
+        $limiter = $registrationLimiter->create($request->getClientIp() ?? 'anonymous');
+        if (!$limiter->consume(1)->isAccepted()) {
+            return $this->json(['message' => 'Too many registration attempts. Please try again later.'], JsonResponse::HTTP_TOO_MANY_REQUESTS);
+        }
+
         try {
             $payload = $request->toArray();
         } catch (\Throwable) {

@@ -169,9 +169,11 @@ palier avec ses tests :
 | Webhook Stripe robuste (confirm/échec, idempotent, signature) | ✅ | `ApiStripePaymentController::webhook` via lifecycle |
 | Idempotence paiement (réutilisation hold + Idempotency-Key) | ✅ | `findReusablePending`, `StripeClient` |
 | Changement de mot de passe | ✅ | `POST /api/customers/me/password` |
-| Validation entité + tests unitaires/intégration | ✅ | contraintes `Assert`, `tests/Unit/*`, `tests/Api/*` |
+| Anti-contournement du garde via `PATCH` (reschedule re-validé) | ✅ | `ReservationPatchProcessor` |
+| Rate limiting login + register (429) | ✅ | `login_throttling`, limiteur `registration`, `ApiAuthenticationFailureHandler` |
+| Validation entité + tests unitaires/fonctionnels | ✅ | contraintes `Assert`, `tests/Unit/*`, `tests/Functional/*` |
 
-Tests : **36 tests PHPUnit** (14 unitaires sur les services purs + 22 fonctionnels
+Tests : **40 tests PHPUnit** (14 unitaires sur les services purs + 26 fonctionnels
 HTTP via le client API Platform), voir `tests/README.md` (`make test`).
 
 **Reste hors périmètre de cette branche** (volontairement) : restriction CORS,
