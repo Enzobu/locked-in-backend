@@ -34,6 +34,19 @@ final class StripeClient
         return $this->request('GET', '/payment_intents/'.$paymentIntentId);
     }
 
+    /**
+     * Refunds a payment intent (full refund unless an amount in cents is given).
+     */
+    public function createRefund(string $paymentIntentId, ?int $amountCents = null): array
+    {
+        $payload = ['payment_intent' => $paymentIntentId];
+        if ($amountCents !== null) {
+            $payload['amount'] = $amountCents;
+        }
+
+        return $this->request('POST', '/refunds', $payload);
+    }
+
     public function verifyAndDecodeWebhook(string $payload, ?string $signatureHeader): array
     {
         if ($this->webhookSecret === '') {

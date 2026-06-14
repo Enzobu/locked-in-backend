@@ -57,6 +57,43 @@ class ReservationRepository extends ServiceEntityRepository
     }
 
     /**
+     * True when a confirmed/active reservation currently occupies the locker (now within its window).
+     */
+    public function hasOccupyingReservation(Locker $locker, \DateTimeImmutable $now): bool
+    {
+        return (int) $this->createQueryBuilder('r')
+            ->select('COUNT(r.id)')
+            ->andWhere('r.locker = :locker')
+            ->andWhere('r.status IN (:occupying)')
+            ->andWhere('r.startsAt <= :now')
+            ->andWhere('r.endsAt > :now')
+            ->setParameter('locker', $locker)
+            ->setParameter('occupying', [ReservationStatus::CONFIRMED->value, ReservationStatus::ACTIVE->value])
+            ->setParameter('now', $now)
+            ->getQuery()
+            ->getSingleScalarResult() > 0;
+    }
+
+    /**
+     * True when the locker still has a *paid* reservation that has not ended yet
+     * (a current or upcoming confirmed commitment). PENDING holds are tentative
+     * and intentionally do not reserve the locker.
+     */
+    public function hasActiveReservation(Locker $locker, \DateTimeImmutable $now): bool
+    {
+        return (int) $this->createQueryBuilder('r')
+            ->select('COUNT(r.id)')
+            ->andWhere('r.locker = :locker')
+            ->andWhere('r.status IN (:confirmed)')
+            ->andWhere('r.endsAt > :now')
+            ->setParameter('locker', $locker)
+            ->setParameter('confirmed', [ReservationStatus::CONFIRMED->value, ReservationStatus::ACTIVE->value])
+            ->setParameter('now', $now)
+            ->getQuery()
+            ->getSingleScalarResult() > 0;
+    }
+
+    /**
      * Returns PENDING reservations created before $threshold that were never paid,
      * so they can be expired and the locker freed.
      *

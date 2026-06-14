@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Enum\ReservationStatus;
 use App\Repository\ReservationRepository;
+use App\State\ReservationPatchProcessor;
 use App\State\ReservationPostProcessor;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -19,7 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
     new Get(security: "object.getCustomer() == user"),
     new GetCollection(security: "is_granted('ROLE_CUSTOMER')"),
     new Post(processor: ReservationPostProcessor::class),
-    new Patch(security: "object.getCustomer() == user"),
+    new Patch(security: "object.getCustomer() == user", processor: ReservationPatchProcessor::class),
     new Delete(security: "object.getCustomer() == user"),
 ])]
 #[ORM\HasLifecycleCallbacks]
@@ -74,6 +75,15 @@ class Reservation
 
     #[ORM\Column(length: 50)]
     private string $overtimePaymentStatus = 'none';
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $cancelledAt = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $refundId = null;
+
+    #[ORM\Column(length: 50, options: ['default' => 'none'])]
+    private string $refundStatus = 'none';
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -291,6 +301,42 @@ class Reservation
     public function setOvertimePaymentStatus(string $overtimePaymentStatus): static
     {
         $this->overtimePaymentStatus = strtolower(trim($overtimePaymentStatus));
+
+        return $this;
+    }
+
+    public function getCancelledAt(): ?\DateTimeImmutable
+    {
+        return $this->cancelledAt;
+    }
+
+    public function setCancelledAt(?\DateTimeImmutable $cancelledAt): static
+    {
+        $this->cancelledAt = $cancelledAt;
+
+        return $this;
+    }
+
+    public function getRefundId(): ?string
+    {
+        return $this->refundId;
+    }
+
+    public function setRefundId(?string $refundId): static
+    {
+        $this->refundId = $refundId;
+
+        return $this;
+    }
+
+    public function getRefundStatus(): string
+    {
+        return $this->refundStatus;
+    }
+
+    public function setRefundStatus(string $refundStatus): static
+    {
+        $this->refundStatus = strtolower(trim($refundStatus));
 
         return $this;
     }
