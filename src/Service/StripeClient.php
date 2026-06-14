@@ -24,9 +24,9 @@ final class StripeClient
         ]);
     }
 
-    public function createPaymentIntent(array $payload): array
+    public function createPaymentIntent(array $payload, ?string $idempotencyKey = null): array
     {
-        return $this->request('POST', '/payment_intents', $payload);
+        return $this->request('POST', '/payment_intents', $payload, $idempotencyKey);
     }
 
     public function retrievePaymentIntent(string $paymentIntentId): array
@@ -87,7 +87,7 @@ final class StripeClient
         return $decoded;
     }
 
-    private function request(string $method, string $path, array $payload = []): array
+    private function request(string $method, string $path, array $payload = [], ?string $idempotencyKey = null): array
     {
         if ($this->secretKey === '') {
             throw new \RuntimeException('Stripe secret key is not configured.');
@@ -98,6 +98,12 @@ final class StripeClient
                 'Authorization' => 'Bearer '.$this->secretKey,
             ],
         ];
+
+        // Stripe deduplicates retried POSTs sharing an Idempotency-Key, preventing
+        // duplicate charges when a request is replayed (e.g. double submit).
+        if ($idempotencyKey !== null && $idempotencyKey !== '') {
+            $options['headers']['Idempotency-Key'] = $idempotencyKey;
+        }
 
         if ($payload !== []) {
             $options['body'] = $payload;

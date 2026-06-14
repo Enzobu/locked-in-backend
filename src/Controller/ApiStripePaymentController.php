@@ -9,6 +9,7 @@ use App\Enum\ReservationStatus;
 use App\Repository\LockerRepository;
 use App\Repository\ReservationRepository;
 use App\Service\Reservation\ReservationAvailabilityChecker;
+use App\Service\Reservation\ReservationLifecycleService;
 use App\Service\ReservationPricingService;
 use App\Service\StripeClient;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,6 +27,7 @@ class ApiStripePaymentController extends AbstractController
     public function createIntent(
         Request $request,
         LockerRepository $lockerRepository,
+        ReservationRepository $reservationRepository,
         ReservationPricingService $pricingService,
         StripeClient $stripeClient,
         EntityManagerInterface $entityManager,
@@ -60,6 +62,31 @@ class ApiStripePaymentController extends AbstractController
             $endsAt = new \DateTimeImmutable($endsAtRaw);
         } catch (\Throwable) {
             return $this->json(['message' => 'Invalid startsAt or endsAt format.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Idempotency: if an identical PENDING hold already exists for this customer,
+        // locker and slot, reuse it instead of creating a duplicate reservation/charge.
+        $existing = $reservationRepository->findReusablePending($customer, $locker, $startsAt, $endsAt);
+        if ($existing instanceof Reservation) {
+            $clientSecret = null;
+            $existingIntentId = $existing->getPaymentIntentId();
+            if (is_string($existingIntentId) && $existingIntentId !== '') {
+                try {
+                    $clientSecret = $stripeClient->retrievePaymentIntent($existingIntentId)['client_secret'] ?? null;
+                } catch (\Throwable) {
+                    $clientSecret = null;
+                }
+            }
+
+            return $this->json([
+                'reservationId' => $existing->getId(),
+                'amountCents' => $existing->getPlannedAmountCents(),
+                'currency' => $existing->getCurrency(),
+                'paymentIntentId' => $existing->getPaymentIntentId(),
+                'clientSecret' => $clientSecret,
+                'status' => $existing->getPaymentStatus(),
+                'idempotentReuse' => true,
+            ], Response::HTTP_OK);
         }
 
         $plannedAmountCents = $pricingService->computePlannedAmountCents($locker, $startsAt, $endsAt);
@@ -103,7 +130,7 @@ class ApiStripePaymentController extends AbstractController
                 'metadata[flow]' => 'initial',
                 'metadata[customer_id]' => (string) $customer->getId(),
                 'metadata[locker_id]' => (string) $locker->getId(),
-            ]);
+            ], 'pi-resv-'.$reservation->getId());
 
             $reservation
                 ->setPaymentIntentId($intent['id'] ?? null)
@@ -225,6 +252,7 @@ class ApiStripePaymentController extends AbstractController
         StripeClient $stripeClient,
         ReservationRepository $reservationRepository,
         EntityManagerInterface $entityManager,
+        ReservationLifecycleService $lifecycleService,
     ): JsonResponse {
         $payload = $request->getContent();
         $signatureHeader = $request->headers->get('Stripe-Signature');
@@ -268,21 +296,24 @@ class ApiStripePaymentController extends AbstractController
             $flow = $reservation->getPaymentIntentId() === $paymentIntentId ? 'initial' : 'overtime';
         }
 
-        if (in_array($eventType, ['payment_intent.succeeded', 'payment_intent.payment_failed', 'payment_intent.canceled'], true)) {
-            $status = (string) ($object['status'] ?? 'unknown');
+        $status = (string) ($object['status'] ?? 'unknown');
 
+        // Only react to the payment-intent lifecycle events we care about; ignore
+        // everything else (Stripe sends many event types) but still ack with 200 so
+        // Stripe stops retrying. All handlers below are idempotent on retries.
+        if ($eventType === 'payment_intent.succeeded') {
             if ($flow === 'initial') {
-                $reservation->setPaymentStatus($status);
-                if ($eventType === 'payment_intent.succeeded') {
-                    $reservation->setStatus(ReservationStatus::CONFIRMED);
-                }
-                if (in_array($eventType, ['payment_intent.payment_failed', 'payment_intent.canceled'], true)) {
-                    $reservation->setStatus(ReservationStatus::CANCELLED);
-                }
+                $lifecycleService->confirmPaid($reservation);
             } else {
                 $reservation->setOvertimePaymentStatus($status);
             }
-
+            $entityManager->flush();
+        } elseif (in_array($eventType, ['payment_intent.payment_failed', 'payment_intent.canceled'], true)) {
+            if ($flow === 'initial') {
+                $lifecycleService->markPaymentFailed($reservation, $status);
+            } else {
+                $reservation->setOvertimePaymentStatus($status);
+            }
             $entityManager->flush();
         }
 

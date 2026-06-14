@@ -6,6 +6,7 @@ use App\Entity\Reservation;
 use App\Enum\ReservationStatus;
 use App\Service\Locker\LockerStateService;
 use App\Service\StripeClient;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
@@ -27,6 +28,7 @@ final class ReservationLifecycleService
     public function __construct(
         private readonly LockerStateService $lockerStateService,
         private readonly StripeClient $stripeClient,
+        private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -86,6 +88,23 @@ final class ReservationLifecycleService
         $this->refreshLocker($reservation);
     }
 
+    /**
+     * Records a failed/cancelled payment reported by Stripe: cancels the (still
+     * unpaid) reservation and frees the locker. Idempotent.
+     */
+    public function markPaymentFailed(Reservation $reservation, string $stripeStatus): void
+    {
+        $reservation->setPaymentStatus($stripeStatus);
+
+        if (in_array($reservation->getStatus(), self::CANCELLABLE_STATUSES, true)) {
+            $reservation
+                ->setStatus(ReservationStatus::CANCELLED)
+                ->setCancelledAt(new \DateTimeImmutable());
+        }
+
+        $this->releaseLocker($reservation);
+    }
+
     private function refundIfApplicable(Reservation $reservation, \DateTimeImmutable $now): void
     {
         $isPaid = $reservation->getPaymentStatus() === 'succeeded' && $reservation->getPaymentIntentId() !== null;
@@ -119,9 +138,14 @@ final class ReservationLifecycleService
     private function releaseLocker(Reservation $reservation, ?\DateTimeImmutable $now = null): void
     {
         $locker = $reservation->getLocker();
-        if ($locker !== null) {
-            $this->lockerStateService->recompute($locker, $now);
+        if ($locker === null) {
+            return;
         }
+
+        // Persist the reservation's new status first so the recompute queries read
+        // fresh data (otherwise the in-memory change is invisible to the COUNT).
+        $this->entityManager->flush();
+        $this->lockerStateService->recompute($locker, $now);
     }
 
     private function refreshLocker(Reservation $reservation): void

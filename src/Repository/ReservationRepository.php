@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Customer;
 use App\Entity\Locker;
 use App\Entity\Reservation;
 use App\Enum\ReservationStatus;
@@ -94,6 +95,32 @@ class ReservationRepository extends ServiceEntityRepository
     }
 
     /**
+     * Finds an existing PENDING reservation for the exact same customer/locker/slot,
+     * used to make POST /api/payments/intents idempotent on duplicate submits.
+     */
+    public function findReusablePending(
+        Customer $customer,
+        Locker $locker,
+        \DateTimeImmutable $startsAt,
+        \DateTimeImmutable $endsAt,
+    ): ?Reservation {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.customer = :customer')
+            ->andWhere('r.locker = :locker')
+            ->andWhere('r.startsAt = :startsAt')
+            ->andWhere('r.endsAt = :endsAt')
+            ->andWhere('r.status = :pending')
+            ->setParameter('customer', $customer)
+            ->setParameter('locker', $locker)
+            ->setParameter('startsAt', $startsAt)
+            ->setParameter('endsAt', $endsAt)
+            ->setParameter('pending', ReservationStatus::PENDING->value)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
      * Returns PENDING reservations created before $threshold that were never paid,
      * so they can be expired and the locker freed.
      *
@@ -103,7 +130,7 @@ class ReservationRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('r')
             ->andWhere('r.status = :pending')
-            ->andWhere('r.createdAt < :threshold')
+            ->andWhere('r.createdAt <= :threshold')
             ->setParameter('pending', ReservationStatus::PENDING->value)
             ->setParameter('threshold', $threshold)
             ->orderBy('r.createdAt', 'ASC')
