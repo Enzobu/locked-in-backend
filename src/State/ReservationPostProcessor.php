@@ -4,12 +4,17 @@ namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use App\Entity\Locker;
 use App\Entity\Reservation;
+use App\Enum\ReservationStatus;
 use App\Repository\CustomerRepository;
+use App\Service\Reservation\ReservationAvailabilityChecker;
+use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 /**
  * @implements ProcessorInterface<Reservation, Reservation>
@@ -22,6 +27,8 @@ final class ReservationPostProcessor implements ProcessorInterface
         private readonly RequestStack $requestStack,
         private readonly JWTTokenManagerInterface $jwtTokenManager,
         private readonly CustomerRepository $customerRepository,
+        private readonly ReservationAvailabilityChecker $availabilityChecker,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -62,6 +69,21 @@ final class ReservationPostProcessor implements ProcessorInterface
 
         $data->setCustomer($customer);
 
-        return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
+        $locker = $data->getLocker();
+        if (!$locker instanceof Locker) {
+            throw new UnprocessableEntityHttpException('locker is required.');
+        }
+
+        // A reservation always starts its life as PENDING; clients cannot self-assign another status.
+        $data->setStatus(ReservationStatus::PENDING);
+
+        // Lock the locker row + validate availability + persist atomically so two
+        // concurrent requests cannot both book an overlapping slot.
+        return $this->entityManager->wrapInTransaction(function () use ($data, $locker, $operation, $uriVariables, $context) {
+            $this->availabilityChecker->lockLocker($locker);
+            $this->availabilityChecker->assertBookable($locker, $data->getStartsAt(), $data->getEndsAt());
+
+            return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
+        });
     }
 }

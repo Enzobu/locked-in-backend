@@ -8,6 +8,7 @@ use App\Entity\Reservation;
 use App\Enum\ReservationStatus;
 use App\Repository\LockerRepository;
 use App\Repository\ReservationRepository;
+use App\Service\Reservation\ReservationAvailabilityChecker;
 use App\Service\ReservationPricingService;
 use App\Service\StripeClient;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api')]
@@ -27,6 +29,7 @@ class ApiStripePaymentController extends AbstractController
         ReservationPricingService $pricingService,
         StripeClient $stripeClient,
         EntityManagerInterface $entityManager,
+        ReservationAvailabilityChecker $availabilityChecker,
     ): JsonResponse {
         $customer = $this->getUser();
         if (!$customer instanceof Customer) {
@@ -59,30 +62,36 @@ class ApiStripePaymentController extends AbstractController
             return $this->json(['message' => 'Invalid startsAt or endsAt format.'], Response::HTTP_BAD_REQUEST);
         }
 
-        if ($endsAt <= $startsAt) {
-            return $this->json(['message' => 'endsAt must be greater than startsAt.'], Response::HTTP_BAD_REQUEST);
-        }
-
         $plannedAmountCents = $pricingService->computePlannedAmountCents($locker, $startsAt, $endsAt);
         if ($plannedAmountCents <= 0) {
             return $this->json(['message' => 'Invalid computed payment amount.'], Response::HTTP_BAD_REQUEST);
         }
 
+        $reservation = (new Reservation())
+            ->setCustomer($customer)
+            ->setLocker($locker)
+            ->setStartsAt($startsAt)
+            ->setEndsAt($endsAt)
+            ->setStatus(ReservationStatus::PENDING)
+            ->setCurrency('eur')
+            ->setPlannedAmountCents($plannedAmountCents)
+            ->setPaymentStatus('requires_payment_method');
+
+        // Reserve the slot atomically BEFORE talking to Stripe: lock the locker row,
+        // reject overlaps / invalid durations / unavailable lockers, then persist the
+        // PENDING reservation. Committing here books the slot and prevents double-booking.
+        try {
+            $entityManager->wrapInTransaction(function () use ($availabilityChecker, $locker, $startsAt, $endsAt, $reservation, $entityManager): void {
+                $availabilityChecker->lockLocker($locker);
+                $availabilityChecker->assertBookable($locker, $startsAt, $endsAt);
+                $entityManager->persist($reservation);
+            });
+        } catch (HttpException $e) {
+            return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
+        }
+
         try {
             $stripeCustomerId = $this->ensureStripeCustomer($customer, $stripeClient, $entityManager);
-
-            $reservation = (new Reservation())
-                ->setCustomer($customer)
-                ->setLocker($locker)
-                ->setStartsAt($startsAt)
-                ->setEndsAt($endsAt)
-                ->setStatus(ReservationStatus::PENDING)
-                ->setCurrency('eur')
-                ->setPlannedAmountCents($plannedAmountCents)
-                ->setPaymentStatus('requires_payment_method');
-
-            $entityManager->persist($reservation);
-            $entityManager->flush();
 
             $intent = $stripeClient->createPaymentIntent([
                 'amount' => $plannedAmountCents,
