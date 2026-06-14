@@ -11,9 +11,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SpecificationRepository::class)]
 #[ApiResource]
-#[ORM\Table(uniqueConstraints: [
-    new ORM\UniqueConstraint(name: 'uniq_specification_name', columns: ['name']),
-])]
+#[ORM\UniqueConstraint(name: 'uniq_specification_name', columns: ['name'])]
 class Specification
 {
     #[ORM\Id]

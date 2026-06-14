@@ -11,10 +11,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 #[ApiResource]
-#[ORM\Table(uniqueConstraints: [
-    new ORM\UniqueConstraint(name: 'uniq_company_siret', columns: ['siret']),
-    new ORM\UniqueConstraint(name: 'uniq_company_siren', columns: ['siren']),
-])]
+#[ORM\UniqueConstraint(name: 'uniq_company_siret', columns: ['siret'])]
+#[ORM\UniqueConstraint(name: 'uniq_company_siren', columns: ['siren'])]
 #[ORM\HasLifecycleCallbacks]
 class Company
 {

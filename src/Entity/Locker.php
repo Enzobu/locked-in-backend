@@ -12,10 +12,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: LockerRepository::class)]
 #[ApiResource(normalizationContext: ['groups' => ['locker:read']])]
-#[ORM\Table(uniqueConstraints: [
-    new ORM\UniqueConstraint(name: 'uniq_locker_bay_number', columns: ['locker_bay_id', 'number']),
-    new ORM\UniqueConstraint(name: 'uniq_locker_hardware_id', columns: ['hardware_id']),
-])]
+#[ORM\UniqueConstraint(name: 'uniq_locker_bay_number', columns: ['locker_bay_id', 'number'])]
+#[ORM\UniqueConstraint(name: 'uniq_locker_hardware_id', columns: ['hardware_id'])]
 #[ORM\HasLifecycleCallbacks]
 class Locker
 {

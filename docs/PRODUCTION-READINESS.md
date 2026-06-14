@@ -171,8 +171,8 @@ palier avec ses tests :
 | Changement de mot de passe | ✅ | `POST /api/customers/me/password` |
 | Validation entité + tests unitaires/intégration | ✅ | contraintes `Assert`, `tests/Unit/*`, `tests/Api/*` |
 
-Tests : **14 tests PHPUnit** (services purs) + **58 assertions d'intégration HTTP**
-(`tests/Api/`, voir `tests/Api/README.md`).
+Tests : **36 tests PHPUnit** (14 unitaires sur les services purs + 22 fonctionnels
+HTTP via le client API Platform), voir `tests/README.md` (`make test`).
 
 **Reste hors périmètre de cette branche** (volontairement) : restriction CORS,
 secrets de prod, emails + mot de passe oublié (V2), prolongation de réservation

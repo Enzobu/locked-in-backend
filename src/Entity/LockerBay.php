@@ -11,9 +11,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: LockerBayRepository::class)]
 #[ApiResource(normalizationContext: ['groups' => ['locker_bay:read']])]
-#[ORM\Table(uniqueConstraints: [
-    new ORM\UniqueConstraint(name: 'uniq_company_locker_bay_name', columns: ['company_id', 'name']),
-])]
+#[ORM\UniqueConstraint(name: 'uniq_company_locker_bay_name', columns: ['company_id', 'name'])]
 #[ORM\HasLifecycleCallbacks]
 class LockerBay
 {
