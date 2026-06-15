@@ -110,10 +110,10 @@ jobs:
           git commit -m "chore: apply php-cs-fixer"
           git push
 
-  sonarqube:
-    name: SonarQube analysis
+  tests:
+    name: Run tests
     runs-on: ubuntu-latest
-    # needs: tests
+    # needs: docker-build
 
     steps:
       - name: Checkout
@@ -121,11 +121,74 @@ jobs:
         with:
           fetch-depth: 0
 
-    #   - name: Download coverage report
-    #     uses: actions/download-artifact@v4
-    #     with:
-    #       name: php-coverage
-    #       path: api/var/coverage
+      - name: Build Docker images
+        run: docker compose -f compose.yml build
+
+      - name: Start containers
+        run: docker compose -f compose.yml up -d
+
+      - name: Wait for database
+        run: |
+          for i in {1..30}; do
+            if docker compose -f compose.yml exec -T database mysqladmin ping -h localhost -uroot -proot --silent; then
+              echo "Database is ready"
+              exit 0
+            fi
+
+            echo "Waiting for database..."
+            sleep 2
+          done
+
+          echo "Database is not ready"
+          docker compose -f compose.yml logs database
+          exit 1
+
+      - name: debug
+        run: docker compose logs
+
+      - name: Install API dependencies
+        run: docker compose -f compose.yml exec -T apache sh -c 'APP_ENV=test TRUSTED_PROXIES=127.0.0.1 composer install --no-interaction --prefer-dist --no-progress'
+
+      - name: Update database schema
+        run: docker compose -f compose.yml exec -T apache sh -c 'APP_ENV=test TRUSTED_PROXIES=127.0.0.1 php bin/console d:s:u --force -n --env=test'
+
+      - name: Run API tests
+        run: docker compose -f compose.yml exec -T apache sh -c 'APP_ENV=test TRUSTED_PROXIES=127.0.0.1 XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-clover var/coverage/clover.xml'
+
+      - name: Fix Clover paths for SonarQube
+        run: |
+          sed -i 's#/var/www/#api/#g' api/var/coverage/clover.xml
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: php-coverage
+          path: api/var/coverage/clover.xml
+
+      - name: Show Docker logs on failure
+        if: failure()
+        run: docker compose -f compose.yml logs
+
+      - name: Stop containers
+        if: always()
+        run: docker compose -f compose.yml down -v
+
+  sonarqube:
+    name: SonarQube analysis
+    runs-on: ubuntu-latest
+    needs: tests
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+
+      - name: Download coverage report
+        uses: actions/download-artifact@v4
+        with:
+          name: php-coverage
+          path: api/var/coverage
 
       - name: Run SonarQube scan
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
