@@ -29,12 +29,7 @@
             restrictWarnings="true"
     >
         <include>
-            <directory>src/Command</directory>
-            <directory>src/Security</directory>
-            <file>src/Service/Locker/LockerStateService.php</file>
-            <file>src/Service/Reservation/ReservationAvailabilityChecker.php</file>
-            <file>src/Service/Reservation/ReservationLifecycleService.php</file>
-            <file>src/Service/ReservationPricingService.php</file>
+            <directory>src</directory>
         </include>
 
         <deprecationTrigger>
