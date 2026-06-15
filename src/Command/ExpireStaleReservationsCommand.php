@@ -67,9 +67,9 @@ final class ExpireStaleReservationsCommand extends Command
             $this->entityManager->flush();
         }
 
-        $$io->success(sprintf(
-            '[%s] [OK] Expired %d reservation(s) older than %d minute(s).',
-            date('d/m/Y H:i:s'),
+        $io->success(sprintf(
+            '[%s] Expired %d reservation(s) older than %d minute(s).',
+            (new \DateTime())->format('d/m/Y H:i:s'),
             $expired,
             $minutes
         ));
