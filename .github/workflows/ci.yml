@@ -159,7 +159,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: php-coverage
-          path: var/www/var/coverage/clover.xml
+          path: var/coverage/clover.xml
+          if-no-files-found: error
 
       - name: Show Docker logs on failure
         if: failure()
@@ -184,7 +185,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: php-coverage
-          path: var/www/var/coverage
+          path: var/coverage
+
+      - name: Verify coverage report
+        run: test -s var/coverage/clover.xml
 
       - name: Run SonarQube scan
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
