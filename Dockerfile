@@ -32,7 +32,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     pdo_mysql \
     zip
 
-RUN pecl install redis && docker-php-ext-enable redis
+RUN pecl install redis pcov && docker-php-ext-enable redis pcov
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 

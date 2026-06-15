@@ -12,6 +12,7 @@ use App\Entity\LockerBay;
 use App\Entity\Specification;
 use App\Enum\LockerStatus;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\SchemaTool;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -24,6 +25,7 @@ abstract class AbstractApiTestCase extends ApiTestCase
     protected Client $client;
     protected EntityManagerInterface $em;
 
+    private static bool $schemaReady = false;
     private int $sequence = 0;
 
     protected function setUp(): void
@@ -33,11 +35,27 @@ abstract class AbstractApiTestCase extends ApiTestCase
         // requests are visible to the test's EntityManager (after clear()).
         $this->client->disableReboot();
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
+        $this->ensureSchemaExists();
         $this->resetDatabase();
 
         // Reset rate-limit counters so login/registration throttling state never
         // leaks between tests.
         static::getContainer()->get('cache.rate_limiter')->clear();
+    }
+
+    private function ensureSchemaExists(): void
+    {
+        if (self::$schemaReady) {
+            return;
+        }
+
+        $connection = $this->em->getConnection();
+        if ($connection->createSchemaManager()->listTableNames() === []) {
+            $schemaTool = new SchemaTool($this->em);
+            $schemaTool->createSchema($this->em->getMetadataFactory()->getAllMetadata());
+        }
+
+        self::$schemaReady = true;
     }
 
     private function resetDatabase(): void
