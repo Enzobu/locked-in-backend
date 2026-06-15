@@ -155,15 +155,11 @@ jobs:
       - name: Run API tests
         run: docker compose -f compose.yml exec -T apache sh -c 'APP_ENV=test TRUSTED_PROXIES=127.0.0.1 XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-clover var/coverage/clover.xml'
 
-      - name: Fix Clover paths for SonarQube
-        run: |
-          sed -i 's#/var/www/#g' var/coverage/clover.xml
-
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
           name: php-coverage
-          path: var/coverage/clover.xml
+          path: var/www/var/coverage/clover.xml
 
       - name: Show Docker logs on failure
         if: failure()
@@ -188,7 +184,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: php-coverage
-          path: api/var/coverage
+          path: var/www/var/coverage
 
       - name: Run SonarQube scan
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
