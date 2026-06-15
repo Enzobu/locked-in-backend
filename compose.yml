@@ -51,6 +51,18 @@ services:
       - locked-in_network
     restart: unless-stopped
 
+  stripe-cli:
+    image: stripe/stripe-cli:latest
+    container_name: locked-in-stripe-cli
+    command: listen --forward-to http://apache:80/api/stripe/webhook
+    environment:
+      - STRIPE_API_KEY=${STRIPE_SECRET_KEY}
+    depends_on:
+      - apache
+    networks:
+      - locked-in_network
+    restart: unless-stopped
+
 networks:
   locked-in_network:
     driver: bridge
