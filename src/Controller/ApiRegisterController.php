@@ -36,7 +36,7 @@ class ApiRegisterController extends AbstractController
             return $this->json(['message' => 'Invalid JSON payload.'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        $requiredFields = ['email', 'password', 'firstname', 'lastname', 'birthDate', 'address'];
+        $requiredFields = ['email', 'password', 'firstname', 'lastname', 'birthDate'];
         foreach ($requiredFields as $field) {
             if (!isset($payload[$field]) || $payload[$field] === '') {
                 return $this->json(['message' => sprintf('Field "%s" is required.', $field)], JsonResponse::HTTP_BAD_REQUEST);
@@ -63,24 +63,27 @@ class ApiRegisterController extends AbstractController
             return $this->json(['message' => 'Invalid birthDate format.'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        $addressReference = $payload['address'];
-        $addressId = null;
+        $address = null;
+        if (isset($payload['address']) && $payload['address'] !== '') {
+            $addressReference = $payload['address'];
+            $addressId = null;
 
-        if (is_numeric($addressReference)) {
-            $addressId = (int) $addressReference;
-        }
+            if (is_numeric($addressReference)) {
+                $addressId = (int) $addressReference;
+            }
 
-        if (is_string($addressReference) && preg_match('#^/api/addresses/(\d+)$#', $addressReference, $matches) === 1) {
-            $addressId = (int) $matches[1];
-        }
+            if (is_string($addressReference) && preg_match('#^/api/addresses/(\d+)$#', $addressReference, $matches) === 1) {
+                $addressId = (int) $matches[1];
+            }
 
-        if ($addressId === null) {
-            return $this->json(['message' => 'Invalid address reference. Use an address ID or IRI (/api/addresses/{id}).'], JsonResponse::HTTP_BAD_REQUEST);
-        }
+            if ($addressId === null) {
+                return $this->json(['message' => 'Invalid address reference. Use an address ID or IRI (/api/addresses/{id}).'], JsonResponse::HTTP_BAD_REQUEST);
+            }
 
-        $address = $addressRepository->find($addressId);
-        if ($address === null) {
-            return $this->json(['message' => 'Address not found.'], JsonResponse::HTTP_BAD_REQUEST);
+            $address = $addressRepository->find($addressId);
+            if ($address === null) {
+                return $this->json(['message' => 'Address not found.'], JsonResponse::HTTP_BAD_REQUEST);
+            }
         }
 
         $customer = (new Customer())
@@ -90,7 +93,9 @@ class ApiRegisterController extends AbstractController
             ->setBirthDate($birthDate)
             ->setRoles(['ROLE_CUSTOMER']);
 
-        $customer->addAddress($address);
+        if ($address !== null) {
+            $customer->addAddress($address);
+        }
 
         $customer->setPassword($passwordHasher->hashPassword($customer, $password));
 
