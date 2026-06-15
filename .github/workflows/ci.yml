@@ -157,13 +157,13 @@ jobs:
 
       - name: Fix Clover paths for SonarQube
         run: |
-          sed -i 's#/var/www/#api/#g' api/var/coverage/clover.xml
+          sed -i 's#/var/www/#g' var/coverage/clover.xml
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
           name: php-coverage
-          path: api/var/coverage/clover.xml
+          path: var/coverage/clover.xml
 
       - name: Show Docker logs on failure
         if: failure()

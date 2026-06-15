@@ -8,6 +8,16 @@ if (method_exists(Dotenv::class, 'bootEnv')) {
     (new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
 }
 
+$sassDir = dirname(__DIR__).'/var/sass';
+$sassOutput = $sassDir.'/app.output.css';
+if (!is_file($sassOutput)) {
+    if (!is_dir($sassDir)) {
+        mkdir($sassDir, 0775, true);
+    }
+
+    file_put_contents($sassOutput, '/* Test stylesheet stub. */');
+}
+
 $jwtDir = dirname(__DIR__).'/var/jwt-test';
 $jwtPrivateKey = $jwtDir.'/private.pem';
 $jwtPublicKey = $jwtDir.'/public.pem';
